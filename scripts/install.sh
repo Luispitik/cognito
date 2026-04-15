@@ -69,11 +69,24 @@ if [ ! -f "$PROFILE_FILE" ]; then
     exit 1
 fi
 
+# --- Validar intake del perfil client ---
+if [ "$PROFILE" = "client" ]; then
+    if [ -z "$CLIENT_INTAKE" ]; then
+        echo "❌ El perfil 'client' requiere --client-intake=PATH (archivo JSON)"
+        exit 1
+    fi
+    if [ ! -f "$CLIENT_INTAKE" ]; then
+        echo "❌ Archivo de intake no encontrado: $CLIENT_INTAKE"
+        exit 1
+    fi
+fi
+
 echo "════════════════════════════════════════════"
 echo "Cognito — Instalación"
 echo "════════════════════════════════════════════"
 echo "Perfil: $PROFILE"
 echo "Destino: $TARGET_DIR"
+[ -n "$CLIENT_INTAKE" ] && echo "Intake: $CLIENT_INTAKE"
 echo ""
 
 # --- Crear estructura destino ---
@@ -118,6 +131,13 @@ mkdir -p "$HOME/.claude/commands"
 for cmd in "$REPO_DIR/commands/"*.md; do
     cp "$cmd" "$HOME/.claude/commands/"
 done
+
+# --- Copiar intake del cliente (perfil client) ---
+if [ "$PROFILE" = "client" ] && [ -n "$CLIENT_INTAKE" ]; then
+    echo "→ Copiando intake del cliente..."
+    cp "$CLIENT_INTAKE" "$TARGET_DIR/config/intake.json"
+    echo "  ✓ config/intake.json"
+fi
 
 # --- Aplicar configuración de perfil ---
 echo "→ Aplicando configuración de perfil '$PROFILE'..."

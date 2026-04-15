@@ -31,14 +31,6 @@ jobs:
             **/*.md
             !**/node_modules/**
             !CHANGELOG.md
-          config: |
-            {
-              "default": true,
-              "MD013": false,
-              "MD024": { "siblings_only": true },
-              "MD033": false,
-              "MD041": false
-            }
 
   yaml:
     name: YAML lint

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Luispitik/cognito/security/advisories/new
+    about: Report a security issue privately (see SECURITY.md)
+  - name: Question or discussion
+    url: https://github.com/Luispitik/cognito/discussions
+    about: Ask a question or start a discussion — not a bug or feature request

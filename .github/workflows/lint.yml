@@ -1,0 +1,85 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "**/*.md"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.json"
+      - ".github/workflows/lint.yml"
+      - ".markdownlint.json"
+      - ".yamllint.yml"
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  markdown:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: |
+            **/*.md
+            !**/node_modules/**
+            !CHANGELOG.md
+          config: |
+            {
+              "default": true,
+              "MD013": false,
+              "MD024": { "siblings_only": true },
+              "MD033": false,
+              "MD041": false
+            }
+
+  yaml:
+    name: YAML lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install yamllint
+      - name: yamllint
+        run: |
+          cat > .yamllint.yml <<'YAML'
+          extends: default
+          rules:
+            line-length:
+              max: 200
+              level: warning
+            document-start: disable
+            truthy:
+              allowed-values: ["true", "false", "on", "off"]
+            comments:
+              min-spaces-from-content: 1
+          YAML
+          yamllint -c .yamllint.yml .
+
+  json:
+    name: JSON validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate every JSON file
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            if ! python -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; then
+              echo "::error file=$f::Invalid JSON"
+              fail=1
+            fi
+          done < <(find . -path ./node_modules -prune -o -type f -name '*.json' -print)
+          exit $fail

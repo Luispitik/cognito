@@ -1,0 +1,13 @@
+# CODEOWNERS — every PR automatically requests review from these owners.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+*           @Luispitik
+
+# Critical surface — change with extra care
+/hooks/                  @Luispitik
+/config/                 @Luispitik
+/integrations/           @Luispitik
+/.github/workflows/      @Luispitik
+SECURITY.md              @Luispitik
+CODE_OF_CONDUCT.md       @Luispitik

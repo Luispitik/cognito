@@ -1,0 +1,72 @@
+# Citation File Format — https://citation-file-format.github.io/
+# Use the "Cite this repository" button on GitHub.
+cff-version: 1.2.0
+title: "Cognito — Cognitive Operating System for Claude Code"
+message: "If you use Cognito in academic work or derived projects, please cite it as below."
+type: software
+version: 1.0.0
+date-released: "2026-04-15"
+license: MIT
+url: "https://github.com/Luispitik/cognito"
+repository-code: "https://github.com/Luispitik/cognito"
+abstract: >
+  Cognito is a cognitive operating system that orchestrates seven thinking
+  modes across five project phases for Claude Code, with deterministic hooks
+  on critical gates and creative latitude elsewhere. It addresses two known
+  LLM biases — anchoring and premature convergence — by activating the right
+  thinking mode at the right phase, blocking anti-patterns with shell-based
+  gates, and exposing audience-specific profiles (operator, student, public,
+  client).
+keywords:
+  - claude-code
+  - claude
+  - llm
+  - cognitive-architecture
+  - prompt-engineering
+  - anti-anchoring
+  - hooks
+  - skills
+authors:
+  - given-names: Luis
+    family-names: Salgado
+    alias: Luispitik
+    affiliation: "NorteIA / SalgadoIA"
+    website: "https://salgadoia.com"
+preferred-citation:
+  type: software
+  title: "Cognito — Cognitive Operating System for Claude Code"
+  authors:
+    - given-names: Luis
+      family-names: Salgado
+      alias: Luispitik
+      website: "https://salgadoia.com"
+  version: 1.0.0
+  year: 2026
+  url: "https://github.com/Luispitik/cognito"
+references:
+  - type: software
+    title: Sinapsis
+    authors:
+      - given-names: Luis
+        family-names: Salgado
+        alias: Luispitik
+    url: "https://github.com/Luispitik/sinapsis"
+  - type: book
+    title: "Six Thinking Hats"
+    authors:
+      - given-names: Edward
+        family-names: de Bono
+    year: 1985
+  - type: book
+    title: "Thinking, Fast and Slow"
+    authors:
+      - given-names: Daniel
+        family-names: Kahneman
+    year: 2011
+  - type: generic
+    title: "IA Masters Automation — community"
+    url: "https://www.skool.com/ia-masters-automations/about?ref=b80c70e7e20543c69a9ee1044dab14c5"
+    notes: "Spanish-speaking community on AI automation; provided early feedback and pattern testing."
+  - type: generic
+    title: "salgadoia.com — author's site"
+    url: "https://salgadoia.com"

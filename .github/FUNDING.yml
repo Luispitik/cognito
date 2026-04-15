@@ -1,0 +1,18 @@
+# GitHub Sponsor button configuration
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+
+github: [Luispitik]
+# Uncomment any platform you want exposed:
+# patreon: <user>
+# open_collective: <user>
+# ko_fi: <user>
+# tidelift: <platform-name>/<package-name>
+# community_bridge: <project-name>
+# liberapay: <user>
+# issuehunt: <user>
+# otechie: <user>
+# lfx_crowdfunding: <project-name>
+# polar: <user>
+# buy_me_a_coffee: <user>
+# thanks_dev: u/gh/<user>
+# custom: ["https://example.com/sponsor"]

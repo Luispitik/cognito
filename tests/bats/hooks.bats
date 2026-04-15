@@ -52,22 +52,22 @@ teardown() {
 # Syntax y shebang
 # --------------------------------------------------------------------
 
-@test "phase-detector.sh tiene sintaxis válida" {
+@test "phase-detector.sh tiene sintaxis valida" {
     run bash -n phase-detector.sh
     [ "$status" -eq 0 ]
 }
 
-@test "mode-injector.sh tiene sintaxis válida" {
+@test "mode-injector.sh tiene sintaxis valida" {
     run bash -n mode-injector.sh
     [ "$status" -eq 0 ]
 }
 
-@test "gate-validator.sh tiene sintaxis válida" {
+@test "gate-validator.sh tiene sintaxis valida" {
     run bash -n gate-validator.sh
     [ "$status" -eq 0 ]
 }
 
-@test "session-closer.sh tiene sintaxis válida" {
+@test "session-closer.sh tiene sintaxis valida" {
     run bash -n session-closer.sh
     [ "$status" -eq 0 ]
 }
@@ -82,7 +82,7 @@ teardown() {
 # Funcionamiento básico
 # --------------------------------------------------------------------
 
-@test "phase-detector detecta señal 'vamos a ejecutar'" {
+@test "phase-detector detecta senal 'vamos a ejecutar'" {
     run bash -c 'echo "{\"prompt\":\"vamos a ejecutar\"}" | bash phase-detector.sh'
     [ "$status" -eq 0 ]
     [[ "$output" == *"execution"* ]]
@@ -99,7 +99,7 @@ teardown() {
     [ "$status" -eq 0 ]
 }
 
-@test "phase-detector sobrevive stdin vacío" {
+@test "phase-detector sobrevive stdin vacio" {
     run bash -c 'echo "" | bash phase-detector.sh'
     [ "$status" -eq 0 ]
 }
@@ -141,7 +141,7 @@ teardown() {
 # mode-injector
 # --------------------------------------------------------------------
 
-@test "mode-injector no rompe con payload mínimo" {
+@test "mode-injector no rompe con payload minimo" {
     payload='{"tool":"Read"}'
     run bash -c "echo '$payload' | bash mode-injector.sh"
     [ "$status" -eq 0 ]
@@ -216,7 +216,7 @@ assert s.get('sessionId') == 'state-update-test', f'Got: {s.get(\"sessionId\")}'
 # Fallback sin COGNITO_DIR
 # --------------------------------------------------------------------
 
-@test "phase-detector encuentra su dir si COGNITO_DIR no está definido" {
+@test "phase-detector encuentra su dir si COGNITO_DIR no esta definido" {
     # Desestablece COGNITO_DIR y depende del fallback (parent del script)
     unset COGNITO_DIR
     run bash -c 'echo "{\"prompt\":\"vamos a ejecutar\"}" | bash phase-detector.sh'

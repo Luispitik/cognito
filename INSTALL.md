@@ -50,7 +50,7 @@ git clone https://github.com/<YOUR_GITHUB_USER>/cognito.git ~/cognito
 bash ~/cognito/scripts/install.sh --profile=alumno
 ```
 
-Instala **4 modos pedagógicos** (Divergente, Verificador, Consolidador, Ejecutor) y 2 hooks. Incluye `onboarding-tutorial.md` que Claude lee en la primera sesión para explicar cómo funciona.
+Instala **4 modos pedagógicos** (Divergente, Verificador, Consolidador, Ejecutor) y 2 hooks. Cada SKILL.md incluye explicaciones extendidas que Claude lee al activar el modo por primera vez.
 
 ### Perfil `public` — Open source / genérico
 

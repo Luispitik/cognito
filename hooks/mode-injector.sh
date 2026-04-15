@@ -100,7 +100,7 @@ for mode in active:
     if os.path.exists(skill_full):
         try:
             with open(skill_full, encoding="utf-8") as f:
-                content = "".join(f.readlines()[:60])
+                content = f.read()
             instructions_parts.append(f"\n\n---\n## Modo activo: {mode}\n\n{content}")
         except IOError:
             log(f"No se pudo leer {skill_full}")

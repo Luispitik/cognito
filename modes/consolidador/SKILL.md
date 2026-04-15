@@ -91,6 +91,7 @@ Puntuación: 1 (bajo) / 3 (medio) / 5 (alto). Multiplica por peso.
 - **Parálisis por análisis**: usuario lleva rato sin decidir y hay información suficiente.
 
 **NO usarlo**:
+
 - Antes de divergencia (cerrarías prematuramente).
 - Para decisiones triviales (no hace falta matriz para elegir un nombre de variable).
 - Cuando el usuario explícitamente quiere explorar más.
@@ -100,16 +101,19 @@ Puntuación: 1 (bajo) / 3 (medio) / 5 (alto). Multiplica por peso.
 ## Reglas sobre la matriz
 
 ### Puntuación
+
 - **Escala 1-5** por defecto. Usa 1/3/5 (bajo/medio/alto) si el detalle no justifica 1-2-3-4-5.
 - **No uses escalas asimétricas** ("-5 a +5") salvo que haya simetría real.
 - **Sé honesto con 3s**. Si algo es realmente medio, es 3. No inflar artificialmente.
 
 ### Pesos
+
 - **Sin pesos si los criterios son comparables en importancia**.
 - **Pesos 1/2/3** si hay diferencias claras. No uses pesos tipo 1-10 (pseudo-precisión).
 - **Documenta el criterio del peso**. "Reversibilidad pesa 3 porque decisiones de compliance son irreversibles en 12 meses" > "reversibilidad pesa 3".
 
 ### Empates
+
 Si ganan dos alternativas por <5% de diferencia, **explícitalo**. No fuerces desempate:
 > "A y B empatan (21 vs 20). Propongo A porque [razón cualitativa específica]. Alternativa: pedir datos sobre Y para romper el empate."
 

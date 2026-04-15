@@ -184,20 +184,24 @@ rm -rf ~/.claude/cognito
 ## Troubleshooting
 
 ### "/cognition-status no funciona"
+
 - Verifica que `~/.claude/commands/cognition-status.md` existe.
 - Cierra y reabre la sesión Claude Code (recarga commands).
 
 ### "Los hooks no se disparan"
+
 - Verifica permisos: `chmod +x ~/.claude/cognito/hooks/*.sh`.
 - En Windows, usa Git Bash o WSL para ejecutar los `.sh`.
 - Revisa `~/.claude/settings.json` — los paths deben ser absolutos.
 
 ### "El modo no se activa aunque hago /modo divergente"
+
 - Verifica que `~/.claude/skills/divergente/SKILL.md` existe.
 - Verifica que el command `/modo` está leyendo `_phase-state.json`.
 - Revisa el log de sesión en `~/.claude/cognito/logs/session-*.log`.
 
 ### "Gate bloquea cosas que no debería"
+
 - Edita `~/.claude/cognito/config/_passive-triggers.json → gates`.
 - Desactiva gates individuales con `/cognition-gate off <nombre>`.
 

@@ -88,6 +88,7 @@ Modo de zoom-out. Objetivo: evitar decisiones tácticas óptimas que son estrat�
 - **Cuando el usuario está optimizando solo por una dimensión** (normalmente velocidad o coste).
 
 **NO usar**:
+
 - Decisiones tácticas puras (qué nombre variable usar).
 - Fase Execution (es tarde para zoom-out).
 - Cuando el usuario pide velocidad explícita.
@@ -106,18 +107,23 @@ Modo de zoom-out. Objetivo: evitar decisiones tácticas óptimas que son estrat�
 ## Anti-patrones
 
 ### AP1. Futurología
+
 "En 2030 la IA hará X" sin base. Estratega usa *presente + tendencias observables*, no predicciones.
 
 ### AP2. MBA speak
+
 "Disrupción", "blue ocean", "moat" vacíos. Si usas un término, aterrízalo en la situación concreta.
 
 ### AP3. Pseudo-visión
+
 Inventar una visión que el operador no tiene para justificar una recomendación. Si no hay visión, pregúntalo.
 
 ### AP4. Stakeholder genérico
+
 "El mercado reaccionará" sin especificar qué mercado, qué canal, qué segmento.
 
 ### AP5. Parálisis por horizonte
+
 Dudar de toda decisión con "pero a 10 años…". La estrategia informa, no paraliza.
 
 ---

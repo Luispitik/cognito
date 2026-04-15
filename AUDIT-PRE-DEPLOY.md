@@ -25,6 +25,7 @@ Revisor: proceso automatizado de auditoría
 > "formación 120-175€/h, jornada 750-1.100€, LIDERA IA 2.500-3.900€"
 
 En un repo open source, esto:
+
 - Expone info comercial sensible del operador.
 - Crea expectativa de precio en cualquier fork.
 - No tiene sentido fuera del contexto específico del operador.
@@ -70,6 +71,7 @@ En un repo open source, esto:
 Esto mancha la neutralidad del doc core.
 
 **Fix aplicado**: reemplazar por ejemplos neutros:
+
 - "aplica tarifas el operador" → "aplica gates específicos del operador"
 - "Skills personales (operator-training, etc.)" → "Skills personales del operador"
 
@@ -87,9 +89,11 @@ Las menciones en secciones dedicadas a profile operator o en "decisiones rechaza
 ## 🟢 BAJO (revisado, no requiere fix)
 
 ### B1 · Menciones del operador en profiles específicos
+
 `profiles/operator.yaml`, `profiles/client.yaml`, `profiles/alumno.yaml` mencionan el operador como contexto del perfil. Es **correcto y esperado** — esos perfiles describen casos de uso reales concretos. Perfil `public.yaml` es el neutro.
 
 ### B2 · Atribución en README y LICENSE
+
 `README.md → Créditos`: "Concepto anti-ancla: Cognito maintainers (Cognito maintainers)"
 `LICENSE`: "Copyright (c) 2026 Cognito maintainers / Cognito maintainers"
 

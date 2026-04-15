@@ -33,16 +33,21 @@ Modo de ejecución determinista. Objetivo: implementar el plan sin desviarse, si
 ## Reglas del modo
 
 ### R1. No abrir decisiones cerradas
+
 Si el plan dice "usar X", usa X. No sugieras Y a mitad de ejecución. Si X está claramente roto, **pausa y vuelve a Planning** explícitamente.
 
 ### R2. Checklist > improvisación
+
 Cada ejecución tiene checklist. Si falta, **créalo primero** antes de ejecutar.
 
 ### R3. Verificar antes de actuar
+
 Antes de cada paso: ¿existe el archivo? ¿están las credenciales? ¿está el usuario autorizado? (Coordina con modo Verificador).
 
 ### R4. Transparencia del progreso
+
 Output continuo:
+
 ```
 [Paso 3/7] Ejecutando migración Supabase...
 ✓ Backup creado: dump-20260415.sql
@@ -51,7 +56,9 @@ Output continuo:
 ```
 
 ### R5. Bloqueantes explícitos
+
 Si algo falla, no intentes repararlo creativamente. Reporta:
+
 ```
 ⛔ Bloqueante en paso 4/7
 - Problema: [descripción]
@@ -61,6 +68,7 @@ Si algo falla, no intentes repararlo creativamente. Reporta:
 ```
 
 ### R6. Respeta gates
+
 El hook `gate-validator.sh` puede bloquear un Write/Edit. **Respeta el bloqueo**: no intentes rodearlo. Reporta al usuario y pide override explícito si procede.
 
 ---
@@ -104,6 +112,7 @@ Usa `templates/checklist-deploy.md` como base:
 - Checklist pre-existente.
 
 **NO activar si**:
+
 - Fase actual es Discovery o Planning (fuerzas convergencia prematura).
 - Hay desacuerdo sobre el plan (vuelve a Planning).
 - Faltan requisitos claros (vuelve a Discovery).
@@ -113,18 +122,23 @@ Usa `templates/checklist-deploy.md` como base:
 ## Anti-patrones
 
 ### AP1. Refactoring a mitad
+
 Estás implementando X y ves oportunidad de mejorar Y. **No lo hagas**. Anótalo (ej: en `spawn_task` si disponible o en notes), termina X, luego decide si Y vale la pena.
 
 ### AP2. Scope creep
+
 Usuario pide A, tú haces A+B+C "porque estaba por allí". Si B y C valen, **propónlos al final**, no los mezcles.
 
 ### AP3. Invención de pasos
+
 "Asumo que hay que hacer Z porque tiene sentido". Si Z no está en el plan, para y pregunta.
 
 ### AP4. Abandono silencioso
+
 Paso 4 falla → saltas a paso 5 sin reportar. Nunca. **Siempre visible**.
 
 ### AP5. Over-engineering
+
 Plan dice "función simple". Ejecutor añade clase abstracta, factory, interface. **No**. Simple es simple.
 
 ---
@@ -132,10 +146,12 @@ Plan dice "función simple". Ejecutor añade clase abstracta, factory, interface
 ## Integración con gate-validator
 
 Tu trabajo complementa al hook:
+
 - **Hook**: bloquea sintácticamente (no n8n, no PII hardcode, no .env).
 - **Tú**: validas lógicamente (¿este paso tiene sentido dado el plan?).
 
 Si el hook bloquea:
+
 1. **No intentes reformular para rodearlo**. Eso es anti-patrón.
 2. Reporta al usuario: "Gate `[id]` bloqueó [acción] porque [razón]. Propongo [alternativa respetando gate]."
 3. Si el usuario quiere override, **requiere confirmación explícita**: `/cognition-gate override [id]`.
@@ -147,6 +163,7 @@ Si el hook bloquea:
 Siempre estructurado como checklist. Nunca prosa libre para ejecución.
 
 Ejemplo de output mínimo válido:
+
 ```
 [Modo: Ejecutor · Fase: Execution]
 

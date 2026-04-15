@@ -54,27 +54,32 @@ bash dashboard/serve.sh
 ## Vistas
 
 ### Header
+
 - Fase actual con color dinámico
 - Perfil activo
 - Botón "Refrescar"
 
 ### KPIs (4 cards)
+
 - Sesiones totales
 - Modos distintos usados (de 7)
 - Gates disparados
 - Detecciones de fase sugeridas
 
 ### Charts
+
 - **Uso por modo** (bar horizontal): cuántas inyecciones por modo
 - **Sesiones por fase** (doughnut): distribución por fase de cierre
 - **Actividad reciente** (line 30d): sesiones + gates + inyecciones por día
 - **Top 10 gates disparados**: con barra de proporción
 
 ### Sinapsis bridge
+
 - Badge ○ Standalone / ● Activo
 - Si activo: versión, count de instincts, auto-detect
 
 ### Tabla de sesiones recientes
+
 - Session ID, fecha relativa, fase, métricas
 
 ## Regenerar datos periódicamente
@@ -91,19 +96,23 @@ O confía en el botón "Refrescar" del dashboard (que NO regenera, solo re-lee d
 ## Personalización
 
 ### Cambiar el puerto
+
 ```bash
 bash dashboard/serve.sh --port 8080
 ```
 
 ### Apuntar a otra instalación Cognito
+
 ```bash
 bash dashboard/serve.sh --cognito-dir ~/otro-cognito
 ```
 
 ### Cambiar colores
+
 Edita la constante `PALETTE` en `app.js`.
 
 ### Cambiar branding
+
 Edita el `<header>` de `index.html`. La C en la esquina es el logo default.
 
 ## Deploy remoto (opcional)

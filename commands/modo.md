@@ -12,12 +12,14 @@ Activa un modo puntual (override) sin cambiar la fase del proyecto.
 Parsea `$ARGUMENTS`:
 
 ### `/modo <nombre>` — activar
+
 1. Valida que `<nombre>` exista en `~/.claude/cognito/config/_modes.json → modes`.
 2. Lee `~/.claude/cognito/config/_phase-state.json`.
 3. Añade `<nombre>` a `overrideModes` si no está ya.
 4. Guarda estado.
 5. Aplica el modo al contexto actual: lee el SKILL.md del modo (`modes/<nombre>/SKILL.md`) y sigue sus instrucciones para el turno.
 6. Reporta:
+
    ```
    ✓ Modo activado: [nombre]
    Fase actual: [current] — sin cambios
@@ -25,10 +27,12 @@ Parsea `$ARGUMENTS`:
    ```
 
 ### `/modo off <nombre>` — desactivar override
+
 1. Lee `_phase-state.json`.
 2. Quita `<nombre>` de `overrideModes`.
 3. Guarda.
 4. Reporta:
+
    ```
    ✓ Override desactivado: [nombre]
    Modos activos ahora: [defaults de fase]
@@ -37,7 +41,9 @@ Parsea `$ARGUMENTS`:
 Nota: `/modo off <nombre>` solo quita override. Si el modo está activo por ser default de la fase, sigue activo hasta cambiar de fase.
 
 ### `/modo list` — listar modos
+
 Muestra:
+
 ```
 🧠 Modos activos
 Fase: [current]
@@ -50,7 +56,9 @@ Para desactivar override: /modo off <nombre>
 ```
 
 ### `/modo help <nombre>` — explicar modo
+
 Lee `modes/<nombre>/SKILL.md` y muestra:
+
 ```
 ## [Modo nombre]
 

@@ -49,9 +49,11 @@ Atajo al modo Ejecutor de Cognito.
 6. **Sin scope creep**: si ves oportunidad fuera de plan, anota y sigue.
 
 ## Cuándo NO ejecutar
+
 - Fase = Discovery (prematuro).
 - Plan ambiguo o en disputa (vuelve a Planning).
 - Prerequisites no verificados.
 
 ## Nota
+
 Este override es equivalente a entrar en fase Execution para el turno. Si quieres que persista, considera `/fase execution` en vez de solo `/ejecutar`.

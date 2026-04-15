@@ -2,6 +2,7 @@
 <!-- 1-3 sentences: what does this PR change and why? -->
 
 ## Type
+
 - [ ] `feat` — new functionality
 - [ ] `fix` — bug fix
 - [ ] `docs` — documentation only
@@ -12,6 +13,7 @@
 - [ ] `security` — hardening or vulnerability fix
 
 ## Scope
+
 - [ ] Modes (`modes/`)
 - [ ] Phases (`phases/`)
 - [ ] Hooks (`hooks/`)
@@ -25,6 +27,7 @@
 - [ ] Docs / infra
 
 ## Checklist
+
 - [ ] Tests added or updated (pytest and/or bats)
 - [ ] `bash tests/run_tests.sh` passes locally
 - [ ] Documentation updated where relevant (README, ARCHITECTURE, etc.)
@@ -39,6 +42,7 @@
 <!-- "Closes #N", "Refs #N" -->
 
 ## Security review
+
 - [ ] No new external inputs
 - [ ] No new filesystem writes outside `COGNITO_DIR`
 - [ ] No new dependencies (or deps audited and added to Dependabot scope)

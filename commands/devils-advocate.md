@@ -69,8 +69,10 @@ Si PROCEDE, monitorizar:
 5. **Veredicto claro**: no "depende" ni "tal vez".
 
 ## Cuándo NO ejecutar
+
 - Sin propuesta definida en conversación.
 - Usuario pide ejecución (fase Execution activa).
 
 ## Nota
+
 Override. Al terminar, `/modo off devils-advocate` si procede.

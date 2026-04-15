@@ -1,6 +1,7 @@
 # Tests bats — cross-platform profundo
 
 Tests complementarios en [bats-core](https://github.com/bats-core/bats-core) que validan:
+
 - Syntax y ejecutabilidad de los 4 hooks
 - Funcionamiento en bash real (no subprocess Python)
 - Paths con espacios, encoding UTF-8
@@ -48,6 +49,7 @@ Los tests corren automáticamente en el workflow `.github/workflows/test.yml` en
 ## Añadir nuevos tests
 
 Cada test es un bloque `@test "nombre" { ... }`. Usa:
+
 - `run <comando>` para capturar output y status
 - `[ "$status" -eq 0 ]` para chequear exit code
 - `[[ "$output" == *"substring"* ]]` para regex en output

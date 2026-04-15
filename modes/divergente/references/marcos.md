@@ -9,6 +9,7 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 **Principio**: "Invierte siempre, invierte." En lugar de buscar cómo lograr X, busca qué garantiza no-X y elimínalo.
 
 **Procedimiento**:
+
 1. Define el resultado deseado
 2. Invierte: "¿qué garantizaría que esto fracase?"
 3. Lista 5-10 modos de fallo con honestidad brutal
@@ -16,6 +17,7 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 5. La estrategia emerge como conjunción de evitaciones
 
 **Ejemplo genérico (lanzamiento de curso)**:
+
 - Deseo: lanzar formación que llene plazas
 - Inversión: ¿qué garantizaría que nadie compre?
   - Precio mal posicionado (ni premium ni accesible)
@@ -36,21 +38,25 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 **Variantes**:
 
 ### B.1 Recursos
+
 - *1/10 del presupuesto*: ¿qué quitas? Lo que sobreviva es el core.
 - *100x el presupuesto*: ¿qué añades? Revela el techo de ambición.
 - *Cero presupuesto*: ¿se puede con barter, comunidad, contenido?
 
 ### B.2 Tiempo
+
 - *24 horas*: fuerza MVP brutal
 - *5 años*: fuerza pensar plataforma, no producto
 - *Bloque de 4 horas*: fuerza foco
 
 ### B.3 Stack
+
 - *Sin tu stack habitual*: ¿se puede no-code? ¿con Excel?
 - *Solo herramientas que tu cliente ya usa*: integración nativa
 - *Solo open source*: revela dependencias críticas
 
 ### B.4 Equipo
+
 - *Solo tú*: ¿qué automatizas, qué eliminas, qué postpones?
 - *Equipo de 50*: ¿qué se vuelve posible? ¿se justifica?
 
@@ -63,43 +69,51 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 **Bibliotecas mentales útiles**:
 
 ### C.1 Naturaleza (biomimicry)
+
 - Hormigas: optimización de rutas (algoritmos ACO)
 - Cuervos: uso de herramientas y caching
 - Arrecifes de coral: simbiosis para escala
 - Sistemas inmunes: detección de anomalías
 
 ### C.2 Hostelería / restauración
+
 - Mise en place: preparación previa para velocidad
 - Carta vs menú: opciones limitadas mejoran conversión
 - Maître vs camarero: separación de roles
 
 ### C.3 Sanidad
+
 - Triaje: no todo cliente/lead vale lo mismo
 - Protocolos clínicos: estandarización con grados de evidencia
 - Anamnesis: descubrimiento estructurado antes de diagnóstico
 
 ### C.4 Militar / aviación
+
 - OODA loop (Observe-Orient-Decide-Act)
 - Checklists (Atul Gawande): reducción de errores
 - After-action review: aprendizaje sistemático
 
 ### C.5 Deporte de élite
+
 - Periodización: ciclos de carga/descarga
 - Vídeo-análisis: revisión sistemática
 - Marginal gains: agregación de mejoras pequeñas
 
 ### C.6 Psicología
+
 - Refuerzo intermitente: engagement
 - Disonancia cognitiva: cambio de actitud
 - Activación conductual: vencer parálisis
 - A-B-C funcional aplicado a comportamiento
 
 ### C.7 Historia / imperios
+
 - Imperio romano: estandarización + autonomía local
 - Imperio mongol: meritocracia + comunicaciones rápidas (Yam)
 - Venecia: monopolios de información
 
 **Procedimiento**:
+
 1. Describe la estructura del problema (no el contenido)
 2. ¿Quién tiene un problema con esta misma estructura?
 3. Importa su solución, adapta al contexto
@@ -111,6 +125,7 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 **Principio**: no razones por analogía con lo que ya existe. Descompón hasta verdades irreductibles y reconstruye.
 
 **Procedimiento (Aristóteles → Musk)**:
+
 1. **Pregunta lo "obvio"**: ¿por qué esto es así? Repite hasta ley física, lógica, económica o regulatoria.
 2. **Identifica variables verdaderas** (no las recibidas):
    - Coste real de componentes (no precio de mercado)
@@ -119,6 +134,7 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 3. **Reconstruye desde abajo** ignorando las soluciones existentes.
 
 **Ejemplo (precios formación)**:
+
 - Convención: 197-497€
 - Primeros principios:
   - Coste real = X horas × €/hora
@@ -148,6 +164,7 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 **Principio**: los mejores avances no eligen entre atributos en conflicto, los separan.
 
 **Procedimiento**:
+
 1. **Identifica contradicción**: "Mejorar A empeora B."
 2. **Aplica principio de separación**:
    - **Tiempo**: A en T1, B en T2
@@ -157,6 +174,7 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 3. **Verifica**: ¿la contradicción se ha disuelto o solo pospuesto?
 
 **Ejemplo**: quiero más profundidad (A), pero eso aumenta duración (B) y baja conversión.
+
 - Separación en tiempo: formación en 2 fases: rápida + opcional profunda.
 - Separación en nivel: módulos cortos dentro de programa largo.
 
@@ -165,11 +183,13 @@ Lee este archivo cuando necesites profundidad en un marco específico, ejemplos 
 ## G. Random concept (De Bono)
 
 **Procedimiento**:
+
 1. Genera 1-3 conceptos aleatorios sin relación con el problema.
 2. Por cada uno, fuerza al menos 2 conexiones con el problema.
 3. Primeras conexiones serán superficiales. La 3ª-4ª suele ser el insight.
 
 **Ejemplo (captación)**:
+
 - Concepto: *faro*
 - Conexión 1: "visible desde lejos" → SEO
 - Conexión 2: "luz intermitente, ritmo" → cadencia contenido

@@ -12,6 +12,7 @@ Controla la fase activa de Cognito para el proyecto actual.
 Lee `$ARGUMENTS`:
 
 ### Si el argumento es una fase válida
+
 1. Lee `~/.claude/cognito/config/_phases.json` para validar que existe.
 2. Lee `~/.claude/cognito/config/_phase-state.json`.
 3. Actualiza:
@@ -21,6 +22,7 @@ Lee `$ARGUMENTS`:
    - `overrideModes` → vaciar (al cambiar fase, se resetean overrides)
    - `lastUpdatedBy` → "command-fase"
 4. Reporta al usuario:
+
    ```
    ✓ Fase cambiada: [anterior] → [nueva]
    Modos activos por defecto en esta fase: [lista desde _phases.json → defaultModes]
@@ -28,7 +30,9 @@ Lee `$ARGUMENTS`:
    ```
 
 ### Si el argumento es `status` o vacío
+
 Muestra fase actual:
+
 ```
 📍 Fase actual: [current]
    Activa desde: [since]
@@ -39,7 +43,9 @@ Muestra fase actual:
 ```
 
 ### Si el argumento no es válido
+
 Muestra fases disponibles:
+
 ```
 ⚠️ Fase no reconocida: "[arg]"
 Fases válidas:

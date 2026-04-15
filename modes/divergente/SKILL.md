@@ -51,15 +51,19 @@ Comunica el diagnóstico en una línea:
 Cuatro movimientos. No los saltes.
 
 ### 1.1 Re-formulación pura
+
 Re-escribe el problema **sin asumir el enfoque actual**. "Si nadie hubiera propuesto nada, ¿cómo lo formularía?".
 
 ### 1.2 Asunción fundacional
+
 Identifica **la asunción invisible que sostiene el enfoque actual**. "¿Qué tendría que ser cierto para que esto sea lo correcto? ¿Y si no lo fuese?".
 
 ### 1.3 Steel-man del opuesto
+
 Construye el **mejor argumento posible** contra el enfoque actual. Versión fuerte que defendería un experto discrepando.
 
 ### 1.4 Pre-mortem
+
 Imagina 6-12 meses después con el enfoque fracasado. Los 3 modos de fallo más probables.
 
 ---
@@ -88,7 +92,9 @@ Cada alternativa debe cambiar el *qué* o el *cómo* fundamental. Variaciones co
 Profundidad por marco en `references/marcos.md`.
 
 ### Output Fase 2
+
 Lista numerada, cada entrada:
+
 - **Nombre corto** (3-6 palabras)
 - **(Marco usado)**
 - **Descripción** (2-3 líneas)
@@ -99,14 +105,17 @@ Lista numerada, cada entrada:
 ## Fase 3 — Convergencia consciente
 
 ### 3.1 Definir criterios
+
 3-5 criterios operacionalizables (coste, reversibilidad, velocidad, alineación marca, riesgo regulatorio, escalabilidad, diferenciación).
 
 Si es alto impacto, asigna pesos 1-3.
 
 ### 3.2 Matriz comparativa
+
 Usa plantilla `templates/matriz-decision.md`.
 
 ### 3.3 Recomendación + Plan B + Revisión
+
 - **Elegida**: opción + justificación 2-3 líneas.
 - **Plan B**: segunda opción + condición de activación.
 - **Revisar si**: evidencia que cambiaría decisión en 1-3 meses.
@@ -160,23 +169,28 @@ Usa plantilla `templates/matriz-decision.md`.
 ## Triggers de auto-activación
 
 **Verbalización pre-elegida**:
+
 - "voy a hacer", "estoy pensando en", "creo que la mejor opción"
 - "se me ocurre", "mi plan es", "ya tengo decidido"
 
 **Petición explícita**:
+
 - "ayúdame a pensar", "qué se me escapa", "qué no estoy viendo"
 - "rompe el ancla", "diverge", "pensamiento lateral", "brainstorm"
 
 **Patrón conversacional**:
+
 - 3+ turnos iterando misma solución
 - Defensa sin evaluación alternativas
 - Variaciones menores mismo planteamiento
 
 **Contexto**:
+
 - Naming, pricing, posicionamiento, arquitectura
 - Cualquier decisión con trade-offs no triviales
 
 **No activar**:
+
 - Ejecución pura con plantilla (email, docx, comando)
 - Preguntas factuales cerradas
 - Usuario pide velocidad ("rápido", "sin diverger")

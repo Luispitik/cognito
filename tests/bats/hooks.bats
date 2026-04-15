@@ -30,6 +30,19 @@ setup() {
     export COGNITO_DIR="$COGNITO_TEST_DIR"
 }
 
+# Helper: activa un gate opt-in (defaults son neutros post A2 audit)
+enable_gate() {
+    local gate_id="$1"
+    python3 -c "
+import json
+p = '$COGNITO_TEST_DIR/config/_operator-config.json'
+with open(p) as f: c = json.load(f)
+if '$gate_id' not in c['gates']['enabled']:
+    c['gates']['enabled'].append('$gate_id')
+with open(p, 'w') as f: json.dump(c, f)
+"
+}
+
 teardown() {
     cd "$ORIGINAL_DIR"
     rm -rf "$COGNITO_TEST_DIR"
@@ -109,11 +122,19 @@ teardown() {
     [[ "$output" != *"systemMessage"* ]] || [[ "$output" != *"[BLOCK]"* ]]
 }
 
-@test "gate-validator avisa n8n (warn-and-confirm, exit 0)" {
+@test "gate-validator avisa n8n cuando esta activado (warn, exit 0)" {
+    enable_gate "n8n-retired"
     payload='{"tool_input":{"file_path":"workflow.json","content":"{\"type\":\"n8n-workflow\"}"}}'
     run bash -c "echo '$payload' | bash gate-validator.sh"
     [ "$status" -eq 0 ]
     [[ "$output" == *"n8n"* ]] || [[ "$output" == *"systemMessage"* ]]
+}
+
+@test "gate-validator no dispara n8n por default (A2 audit: gates opt-in)" {
+    payload='{"tool_input":{"file_path":"workflow.json","content":"{\"type\":\"n8n-workflow\"}"}}'
+    run bash -c "echo '$payload' | bash gate-validator.sh"
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"n8n"* ]]
 }
 
 # --------------------------------------------------------------------

@@ -78,9 +78,9 @@ Sí. Un operador puede:
 
 ## Atribuciones
 
-- **Cognito**: Luis Salgado · [Luispitik/cognito](https://github.com/Luispitik/cognito) · MIT
+- **Cognito**: Cognito maintainers · [Luispitik/cognito](https://github.com/Luispitik/cognito) · MIT
 - **ACC Core Skills**: `ricautomation` · [ricautomation/acc_core_skills](https://github.com/ricautomation/acc_core_skills) · MIT
-- **Sinapsis** (base arquitectónica de los hooks de Cognito): Luis Salgado · [Luispitik/sinapsis](https://github.com/Luispitik/sinapsis) · MIT
+- **Sinapsis** (base arquitectónica de los hooks de Cognito): Cognito maintainers · [Luispitik/sinapsis](https://github.com/Luispitik/sinapsis) · MIT
 
 ## FAQ
 

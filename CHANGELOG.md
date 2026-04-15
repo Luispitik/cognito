@@ -39,7 +39,7 @@ Versionado semver. Formato inspirado en [keepachangelog.com](https://keepachange
 - Documentación: README, ARCHITECTURE, INSTALL, CONTRIBUTING + READMEs por submódulo (integrations/, tests/bats/, dashboard/).
 
 ### Inspiración
-- Skill anti-ancla original de Luis Salgado (abril 2026).
+- Skill anti-ancla original de Cognito maintainers (abril 2026).
 - Sinapsis v4.3 (Luispitik/sinapsis) — arquitectura de hooks deterministas.
 - Six Thinking Hats (Edward de Bono).
 - Sistema 1/Sistema 2 (Kahneman).

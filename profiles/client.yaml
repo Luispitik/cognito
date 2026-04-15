@@ -3,10 +3,10 @@
 # Target: cliente B2B en proyecto de transformación digital
 profile: client
 version: 1.0.0
-description: "Cliente B2B de NorteIA en transformación digital. Configurable por intake. Incluye reporting orientado a cliente."
+description: "cliente B2B en transformación digital. Configurable por intake. Incluye reporting orientado a cliente."
 
 audience:
-  - Clientes NorteIA en proyectos de 3-12 meses
+  - Clientes el operador en proyectos de 3-12 meses
   - Empresas en transformación digital guiada
   - Equipos mixtos (IT + negocio) trabajando con Claude Code
 
@@ -80,7 +80,7 @@ preferences:
   client_friendly_language: true
 
 notes: |
-  Perfil orientado a cliente B2B de NorteIA.
+  Perfil orientado a cliente B2B del operador.
 
   Clave: intake del cliente determina configuración:
   - gates específicos del cliente
@@ -88,7 +88,7 @@ notes: |
   - brand voice y tono en reporting
   - frecuencia de digest
 
-  Este perfil NO incluye Estratega (se delega al consultor NorteIA)
+  Este perfil NO incluye Estratega (se delega al consultor el operador)
   ni Verificador (se combina con Ejecutor para simplificar).
 
   Reporting incluye:

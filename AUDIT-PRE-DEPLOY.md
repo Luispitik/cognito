@@ -20,7 +20,7 @@ Revisor: proceso automatizado de auditoría
 
 ### C1 · Tarifas comerciales reales expuestas en archivo público
 
-**Archivo**: `config/_passive-triggers.json` (regla `tarifas-norteia`)
+**Archivo**: `config/_passive-triggers.json` (regla `operator-pricing-check`)
 **Problema**: El mensaje del gate contenía cifras reales del operador:
 > "formación 120-175€/h, jornada 750-1.100€, LIDERA IA 2.500-3.900€"
 
@@ -45,7 +45,7 @@ En un repo open source, esto:
 ### A2 · Gates específicos de operador activos por defecto
 
 **Archivo**: `config/_operator-config.json → gates.enabled`
-**Problema**: Incluía `tarifas-norteia` y `eu-ai-act-sources` habilitados por defecto. Esos son del contexto del operador, no universales.
+**Problema**: Incluía `operator-pricing-check` y `eu-ai-act-sources` habilitados por defecto. Esos son del contexto del operador, no universales.
 
 **Fix aplicado**: defaults solo los gates universalmente útiles: `no-commit-env`, `no-hardcode-pii`, `n8n-retired` (este último es opinable pero es un anti-patrón razonable; documentado). Los específicos se describen en `profiles/operator.yaml` y se habilitan al activar ese perfil.
 
@@ -60,38 +60,38 @@ En un repo open source, esto:
 
 ## 🟡 MEDIO
 
-### M1 · Menciones de NorteIA en documentación core
+### M1 · Menciones del operador en documentación core
 
 **Archivo**: `ARCHITECTURE.md` (líneas 41, 141)
-**Problema**: El doc core (no específico a profile operator) menciona NorteIA en ejemplos:
-> "aplica tarifas NorteIA"
-> "Skills personales (norteia-formaciones, etc.)"
+**Problema**: El doc core (no específico a profile operator) mencional operador en ejemplos:
+> "aplica tarifas el operador"
+> "Skills personales (operator-training, etc.)"
 
 Esto mancha la neutralidad del doc core.
 
 **Fix aplicado**: reemplazar por ejemplos neutros:
-- "aplica tarifas NorteIA" → "aplica gates específicos del operador"
-- "Skills personales (norteia-formaciones, etc.)" → "Skills personales del operador"
+- "aplica tarifas el operador" → "aplica gates específicos del operador"
+- "Skills personales (operator-training, etc.)" → "Skills personales del operador"
 
 Las menciones en secciones dedicadas a profile operator o en "decisiones rechazadas" (ejemplo contextual) se mantienen — son contexto, no marca.
 
 ### M2 · `sinapsis_bridge.py` prioriza path específico del operador
 
 **Archivo**: `integrations/sinapsis_bridge.py`
-**Problema**: El primer path candidato era `~/.claude/skills/norteia-continuous-learning` (instalación específica de Luis). Un usuario genérico buscaría primero en `~/.claude/skills/sinapsis`.
+**Problema**: El primer path candidato era `~/.claude/skills/sinapsis-learning` (instalación específica de Luis). Un usuario genérico buscaría primero en `~/.claude/skills/sinapsis`.
 
-**Fix aplicado**: reordenar candidatos — primero `~/.claude/skills/sinapsis` y `~/.sinapsis` (genéricos), luego `norteia-continuous-learning` como último fallback. Esto no rompe la detección en el setup de Luis y mejora la experiencia del usuario público.
+**Fix aplicado**: reordenar candidatos — primero `~/.claude/skills/sinapsis` y `~/.sinapsis` (genéricos), luego `sinapsis-learning` como último fallback. Esto no rompe la detección en el setup de Luis y mejora la experiencia del usuario público.
 
 ---
 
 ## 🟢 BAJO (revisado, no requiere fix)
 
-### B1 · Menciones de NorteIA en profiles específicos
-`profiles/operator.yaml`, `profiles/client.yaml`, `profiles/alumno.yaml` mencionan NorteIA como contexto del perfil. Es **correcto y esperado** — esos perfiles describen casos de uso reales concretos. Perfil `public.yaml` es el neutro.
+### B1 · Menciones del operador en profiles específicos
+`profiles/operator.yaml`, `profiles/client.yaml`, `profiles/alumno.yaml` mencionan el operador como contexto del perfil. Es **correcto y esperado** — esos perfiles describen casos de uso reales concretos. Perfil `public.yaml` es el neutro.
 
 ### B2 · Atribución en README y LICENSE
-`README.md → Créditos`: "Concepto anti-ancla: Luis Salgado (NorteIA / SalgadoIA)"
-`LICENSE`: "Copyright (c) 2026 Luis Salgado / NorteIA / SalgadoIA"
+`README.md → Créditos`: "Concepto anti-ancla: Cognito maintainers (Cognito maintainers)"
+`LICENSE`: "Copyright (c) 2026 Cognito maintainers / Cognito maintainers"
 
 Estas son atribuciones legítimas de autoría, **no promocionales**. Se mantienen.
 
@@ -119,10 +119,10 @@ Estas son atribuciones legítimas de autoría, **no promocionales**. Se mantiene
 
 ## Qué NO se ha tocado (decisión consciente)
 
-1. **El profile operator sigue incluyendo NorteIA** en `operator.yaml` → es su propósito.
-2. **Las skills `profiles/{alumno,client}.yaml` mencionan FUNDAE/B2B NorteIA** como contexto → es ejemplo del caso de uso, no marca.
-3. **`seed_demo.py` incluye `tarifas-norteia`** en los gates ficticios → es solo etiqueta en datos de demo, sin cifras.
-4. **`norteia-continuous-learning` permanece en la lista de paths candidatos** del bridge Sinapsis como fallback → permite que el setup real de Luis funcione sin config extra.
+1. **El profile operator sigue incluyendo el operador** en `operator.yaml` → es su propósito.
+2. **Las skills `profiles/{alumno,client}.yaml` mencionan contexto específico el operador** como contexto → es ejemplo del caso de uso, no marca.
+3. **`seed_demo.py` incluye `operator-pricing-check`** en los gates ficticios → es solo etiqueta en datos de demo, sin cifras.
+4. **`sinapsis-learning` permanece en la lista de paths candidatos** del bridge Sinapsis como fallback → permite que el setup real de Luis funcione sin config extra.
 
 ---
 

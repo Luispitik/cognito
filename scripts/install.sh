@@ -35,7 +35,7 @@ Uso: bash scripts/install.sh --profile=<nombre> [opciones]
 
 Perfiles disponibles:
   operator   Founder/consultor avanzado (default)
-  alumno     Alumno FUNDAE / formación
+  alumno     Alumno de formación corporativa / formación
   public     Open source / genérico
   client     Cliente B2B (requiere --client-intake)
 

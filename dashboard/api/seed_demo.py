@@ -36,7 +36,7 @@ PHASE_MODES = {
 }
 GATES = [
     "n8n-retired", "rls-supabase-required", "no-hardcode-pii",
-    "no-commit-env", "tarifas-norteia", "eu-ai-act-sources",
+    "no-commit-env", "operator-pricing-check", "eu-ai-act-sources",
 ]
 
 SIGNALS = [

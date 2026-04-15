@@ -33,7 +33,7 @@ _CANDIDATE_ROOTS = [
     "~/.claude/skills/sinapsis",
     "~/.sinapsis",
     "~/sinapsis",
-    "~/.claude/skills/norteia-continuous-learning",  # fallback operator profile
+    "~/.claude/skills/sinapsis-learning",  # fallback operator profile
 ]
 
 

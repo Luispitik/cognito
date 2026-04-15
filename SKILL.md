@@ -86,7 +86,7 @@ Nunca cambies la fase sin confirmación explícita.
 ### R5. Perfil manda
 Antes de decidir modos, comprueba si el perfil activo restringe qué modos están disponibles:
 - `alumno` → solo 4 modos (MVP pedagógico).
-- `public` → 7 modos sin contexto NorteIA.
+- `public` → 7 modos sin contexto específico del operador.
 - `client` → 5 modos con gates configurables.
 - `operator` → 7 modos + todas las gates.
 

@@ -190,7 +190,7 @@ Ver [INSTALL.md](INSTALL.md) para detalles por perfil.
 
 ## Créditos
 
-- Concepto anti-ancla: Luis Salgado (NorteIA / SalgadoIA).
+- Concepto anti-ancla: Cognito maintainers (Cognito maintainers).
 - Catálogo de marcos: síntesis de Munger, De Bono, TRIZ, SCAMPER, primeros principios.
 - Arquitectura deterministas: inspirada en Sinapsis (Luispitik/sinapsis).
 - Pattern modos/fases: influenciado por Six Thinking Hats (De Bono) y Sistema 1/2 (Kahneman).

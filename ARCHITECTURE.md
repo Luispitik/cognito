@@ -40,7 +40,7 @@ Las 4 dimensiones ortogonales de Cognito:
 
 Ejemplo: **Fase Execution** × **Modo Ejecutor+Verificador** × **Hook gate-validator activo** × **Perfil Operator** = Claude construye sin divergir, valida anti-patrones (n8n, hardcode), aplica los gates específicos del operador.
 
-Mismo escenario con **Perfil Público** = sin referencias NorteIA, lenguaje neutro, hooks genéricos.
+Mismo escenario con **Perfil Público** = sin referencias a operador específico, lenguaje neutro, hooks genéricos.
 
 ---
 
@@ -64,10 +64,10 @@ Cubre el ciclo: *explorar → criticar → decidir → ejecutar → verificar �
 
 ## 4. Las 5 fases: por qué estas
 
-Escogimos fases **genéricas** sobre fases específicas de NorteIA (Lead/Propuesta/…) por 3 razones:
+Escogimos fases **genéricas** sobre fases específicas de un caso de uso (Lead/Propuesta/…) por 3 razones:
 
 1. **Portabilidad**: funcionan para desarrollo software, consultoría, contenido, formación.
-2. **Audiencia mixta**: el mismo framework sirve a operador avanzado, alumno FUNDAE y cliente B2B.
+2. **Audiencia mixta**: el mismo framework sirve a operador avanzado, alumno de formación corporativa y cliente B2B.
 3. **Mapping fácil**: los perfiles mapean fases genéricas a workflows específicos (ver `profiles/*.yaml`).
 
 ### Transiciones válidas
@@ -141,7 +141,7 @@ La clave es: **la auto-detección sugiere, nunca decide**. El usuario mantiene a
 | **Skills personales** del operador | Ejecución de tareas específicas del dominio |
 
 ### Interacción
-1. Sinapsis aprende que "cuando Luis edita `.env` debe recordarse que no se commitea" → genera instinct.
+1. Sinapsis aprende que "cuando el operador edita `.env` debe recordarse que no se commitea" → genera instinct.
 2. Cognito, en fase Execution con modo Ejecutor, ve ese instinct y lo incorpora al checklist.
 3. Gate-validator de Cognito bloquea `git add .env` con el razonamiento del instinct.
 
@@ -162,19 +162,19 @@ profile: operator
 audience: "Founder/consultor con Claude Code avanzado"
 assumes:
   - Sinapsis instalado
-  - Skills NorteIA presentes
+  - skills del operador presentes
   - Lenguaje técnico denso
 installs:
   modes: [divergente, verificador, devils-advocate, consolidador, ejecutor, estratega, auditor]
   hooks: all
-  gates: [n8n, rls-supabase, tarifas-norteia, eu-ai-act]
+  gates: [n8n, rls-supabase, operator-pricing-check, eu-ai-act]
   templates: all
 ```
 
 ```yaml
 # alumno.yaml
 profile: alumno
-audience: "Alumno curso FUNDAE NorteIA o similar"
+audience: "Alumno curso corporate training programs o similar"
 assumes:
   - Claude Code recién instalado
   - Sin Sinapsis
@@ -194,7 +194,7 @@ installs:
 profile: public
 audience: "Open source, genérico"
 assumes:
-  - Sin contexto NorteIA
+  - Sin contexto del operador
   - Inglés y español
   - Portabilidad máxima
 installs:
@@ -203,7 +203,7 @@ installs:
   gates: []
   templates: all
 strips:
-  - referencias a NorteIA/SalgadoIA
+  - referencias a operator
   - tarifas específicas
   - marcas
 ```
@@ -211,7 +211,7 @@ strips:
 ```yaml
 # client.yaml
 profile: client
-audience: "Cliente B2B de NorteIA en transformación digital"
+audience: "cliente B2B en transformación digital"
 assumes:
   - Stack heterogéneo
   - Necesita documentación
@@ -243,7 +243,7 @@ Semver por componente:
 ### ❌ Agente único que cambia de rol
 Rechazado porque: pérdida de determinismo, rol ambiguo, difícil debuggear qué modo estaba activo cuando algo falló.
 
-### ❌ Fases específicas NorteIA como default
+### ❌ Fases específicas del operador como default
 Rechazado porque: baja portabilidad. Las fases específicas quedan en `profiles/operator.yaml → mapping`.
 
 ### ❌ Auto-cambio de fase por detección

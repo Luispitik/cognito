@@ -26,7 +26,7 @@ Cognito funciona **standalone por defecto**. Las integraciones de este directori
 2. `_operator-config.json → integrations.sinapsis.path`.
 3. Variable de entorno `SINAPSIS_DIR`.
 4. Rutas candidatas:
-   - `~/.claude/skills/norteia-continuous-learning`
+   - `~/.claude/skills/sinapsis-learning`
    - `~/.claude/skills/sinapsis`
    - `~/.sinapsis`
    - `~/sinapsis`

@@ -120,4 +120,4 @@ Sé respetuoso. La crítica debe ser sobre el código, no sobre personas. Ver [C
 
 - Issues: GitHub Issues del repo.
 - Preguntas técnicas: Discussions del repo.
-- Privado: Luis Salgado, NorteIA.
+- Privado: Cognito maintainers, el operador.

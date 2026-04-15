@@ -41,7 +41,7 @@ cp ~/cognito/config/_phase-state.default.json ~/.claude/cognito/config/_phase-st
 /cognition-status
 ```
 
-### Perfil `alumno` — Alumno FUNDAE / formación
+### Perfil `alumno` — Alumno de formación corporativa / formación
 
 **Asume**: Claude Code recién instalado, sin Sinapsis, necesita explicaciones.
 
@@ -54,7 +54,7 @@ Instala **4 modos pedagógicos** (Divergente, Verificador, Consolidador, Ejecuto
 
 ### Perfil `public` — Open source / genérico
 
-**Asume**: Sin contexto NorteIA, portabilidad máxima.
+**Asume**: Sin contexto del operador, portabilidad máxima.
 
 ```bash
 git clone https://github.com/<YOUR_GITHUB_USER>/cognito.git
@@ -62,11 +62,11 @@ cd cognito
 ./scripts/install.sh --profile=public
 ```
 
-Instala los 7 modos con lenguaje neutro (sin referencias NorteIA/SalgadoIA), sin gates específicos.
+Instala los 7 modos con lenguaje neutro (sin referencias operator), sin gates específicos.
 
 ### Perfil `client` — Cliente B2B
 
-**Asume**: Cliente NorteIA en proyecto de transformación digital.
+**Asume**: Cliente el operador en proyecto de transformación digital.
 
 ```bash
 ./scripts/install.sh --profile=client --client-intake=./client-intake.json

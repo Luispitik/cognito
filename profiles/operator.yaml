@@ -8,7 +8,7 @@ description: "Founder, consultor o usuario avanzado con Claude Code integrado. A
 audience:
   - Founders solo-founders con setup avanzado
   - Consultores que usan Claude Code diariamente
-  - Operadores NorteIA / SalgadoIA / similares
+  - Operadores Cognito maintainers / similares
 
 assumes:
   sinapsis: true
@@ -36,7 +36,7 @@ installs:
     - rls-supabase-required
     - no-hardcode-pii
     - no-commit-env
-    - tarifas-norteia
+    - operator-pricing-check
     - eu-ai-act-sources
   templates:
     - matriz-decision
@@ -46,7 +46,7 @@ installs:
     - auditoria-output
 
 phase_mapping:
-  description: "Mapeo opcional de fases Cognito a workflow NorteIA"
+  description: "Mapeo opcional de fases Cognito a workflow el operador"
   discovery: "Lead + briefing + pre-auditoría"
   planning: "Propuesta + Plan Director + matriz"
   execution: "Implementación + formación + auditoría técnica"
@@ -70,7 +70,7 @@ preferences:
 
 notes: |
   Este perfil asume que el operador ya tiene context dense:
-  stack NorteIA, marcas, tarifas, EU AI Act, etc.
+  stack el operador, marcas, tarifas, EU AI Act, etc.
 
   Los gates están calibrados para este contexto.
   Las plantillas usan tono técnico, sin explicaciones básicas.

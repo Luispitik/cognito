@@ -1,12 +1,12 @@
 ---
 # Perfil: Alumno
-# Target: alumno de formación FUNDAE / curso Claude Code / similar
+# Target: alumno de formación corporativa / curso Claude Code / similar
 profile: alumno
 version: 1.0.0
-description: "Alumno en proceso de formación. MVP pedagógico con 4 modos, explicaciones extendidas, sin contexto NorteIA específico."
+description: "Alumno en proceso de formación. MVP pedagógico con 4 modos, explicaciones extendidas, sin contexto específico del operador específico."
 
 audience:
-  - Alumnos cursos FUNDAE NorteIA
+  - Alumnos cursos corporate training programs
   - Alumnos autoformación Claude Code
   - Personas recién introducidas al pensamiento cognitivo estructurado
 

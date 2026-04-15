@@ -7,15 +7,24 @@ import pytest
 
 
 class TestConfigJsonsParse:
-    """Los 5 JSONs parsean sin error."""
+    """Los 5 JSONs parsean sin error.
+
+    Nota: _phase-state.json es runtime (en .gitignore), solo testeamos el
+    .default.json que sí está versionado. El runtime file lo crea el
+    installer al ejecutarse, o conftest.isolated_cognito_env en los tests
+    que lo necesitan.
+    """
 
     def test_phase_state_default_parses(self, config_dir):
         with open(config_dir / "_phase-state.default.json") as f:
             json.load(f)
 
-    def test_phase_state_parses(self, config_dir):
-        with open(config_dir / "_phase-state.json") as f:
-            json.load(f)
+    def test_phase_state_runtime_parses_if_exists(self, config_dir):
+        """El runtime file solo existe en entorno local; en CI no debe existir."""
+        runtime = config_dir / "_phase-state.json"
+        if runtime.exists():
+            with open(runtime) as f:
+                json.load(f)
 
     def test_modes_parses(self, config_dir):
         with open(config_dir / "_modes.json") as f:

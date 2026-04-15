@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "description": "Configuración del operador activo. Defaults neutros (profile=public). El instalador sobrescribe con --profile=X. Se puede editar manualmente.",
+  "profile": "public",
+  "preferences": {
+    "language": "en",
+    "codeLanguage": "en",
+    "verbosity": "medium",
+    "announceMode": "on-change",
+    "announcePhaseChange": true,
+    "autoSuggestPhaseChange": true,
+    "allowAutoPhaseChange": false
+  },
+  "modes": {
+    "enabled": ["divergente", "verificador", "devils-advocate", "consolidador", "ejecutor", "estratega", "auditor"],
+    "disabled": []
+  },
+  "gates": {
+    "enabled": ["no-commit-env", "no-hardcode-pii"],
+    "disabled": [],
+    "available": ["no-commit-env", "no-hardcode-pii", "n8n-retired", "rls-supabase-required", "operator-pricing-check", "compliance-sources-required"]
+  },
+  "integrations": {
+    "sinapsis": {
+      "installed": false,
+      "autoDetect": true,
+      "delegateToSinapsis": ["instinct-observation", "instinct-learning", "knowledge-index"]
+    },
+    "skillRouter": {
+      "installed": false
+    }
+  },
+  "customModes": [],
+  "notes": "Defaults neutros listos para instalación. Al aplicar un profile (/cognition-profile operator|alumno|client|public), este archivo se actualiza. Edita manualmente para personalización fina; mantén backup antes de cambios grandes."
+}

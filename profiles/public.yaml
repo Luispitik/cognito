@@ -1,0 +1,85 @@
+---
+# Perfil: Public
+# Target: open source, usuarios genéricos, portabilidad máxima
+profile: public
+version: 1.0.0
+description: "Perfil genérico para open source. Sin contexto específico de operador (NorteIA/SalgadoIA). Lenguaje neutro. Portable a cualquier stack."
+
+audience:
+  - Usuarios open source
+  - Operadores de otros sectores (no NorteIA)
+  - Contributors a Cognito
+
+assumes:
+  sinapsis: false
+  skill_router: false
+  skills_personales: false
+  language: "es-ES | en-US (configurable)"
+  technical_level: "intermediate-advanced"
+
+installs:
+  modes:
+    - divergente
+    - verificador
+    - devils-advocate
+    - consolidador
+    - ejecutor
+    - estratega
+    - auditor
+  hooks:
+    - mode-injector
+    - session-closer
+    # gate-validator opcional, instalarlo requiere configurar gates propias
+  gates: []  # vacío por defecto; el usuario define los suyos
+  templates:
+    - matriz-decision
+    - pre-mortem
+    - steel-man
+    - checklist-deploy
+    - auditoria-output
+
+phase_mapping:
+  description: "Fases genéricas sin mapping específico"
+  discovery: "Discovery"
+  planning: "Planning"
+  execution: "Execution"
+  review: "Review"
+  shipping: "Shipping"
+
+strips:
+  description: "Elementos que se quitan del código y docs al instalar este perfil"
+  items:
+    - "Referencias específicas a NorteIA"
+    - "Referencias específicas a SalgadoIA"
+    - "Tarifas específicas (120-175€/h, 750-1.100€/jornada, LIDERA IA)"
+    - "Marcas propietarias (Sinapsis, obsidian-sync)"
+    - "Gates específicas de stack (Supabase RLS, n8n retired)"
+
+preferences:
+  verbosity: medium
+  announce_mode_change: on-change
+  announce_phase_change: true
+  auto_suggest_phase_change: true
+  allow_auto_phase_change: false
+  locale_fallback: en-US
+
+customization_guide: |
+  Para añadir tus propios gates:
+  1. Edita `_passive-triggers.json → gates`
+  2. Añade tu regla con id, pattern, filesAffected, action, message
+  3. Reinicia sesión de Claude Code
+
+  Para mapping a tu workflow:
+  1. Edita `profiles/public.yaml → phase_mapping`
+  2. Renombra las fases a tu vocabulario
+
+notes: |
+  Perfil base para contributors y open source.
+  El diseño debe permitir fork sin tocar core.
+
+  Ideal para:
+  - Desarrolladores individuales
+  - Pequeños equipos
+  - Proyectos open source
+
+  Incluye documentación de cómo extender para tu caso.

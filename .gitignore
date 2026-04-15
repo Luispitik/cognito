@@ -1,0 +1,61 @@
+# Cognito — .gitignore
+
+# Logs y sesiones (runtime state)
+logs/
+sessions/
+*.log
+
+# Estado mutable (no versionar)
+config/_phase-state.json
+# NOTA: _phase-state.default.json SÍ se versiona
+
+# Dashboard data (regenerable)
+dashboard/data.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Temporary
+*.tmp
+*.bak
+.tmp/
+
+# Secrets (nunca commitear)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/

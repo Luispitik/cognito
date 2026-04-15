@@ -1,0 +1,76 @@
+---
+# Perfil: Operator
+# Target: founder/consultor con Claude Code avanzado, sistema integrado
+profile: operator
+version: 1.0.0
+description: "Founder, consultor o usuario avanzado con Claude Code integrado. Asume Sinapsis presente, skills personales, lenguaje denso."
+
+audience:
+  - Founders solo-founders con setup avanzado
+  - Consultores que usan Claude Code diariamente
+  - Operadores NorteIA / SalgadoIA / similares
+
+assumes:
+  sinapsis: true
+  skill_router: true
+  skills_personales: true
+  language: es-ES
+  technical_level: high
+
+installs:
+  modes:
+    - divergente
+    - verificador
+    - devils-advocate
+    - consolidador
+    - ejecutor
+    - estratega
+    - auditor
+  hooks:
+    - phase-detector
+    - mode-injector
+    - gate-validator
+    - session-closer
+  gates:
+    - n8n-retired
+    - rls-supabase-required
+    - no-hardcode-pii
+    - no-commit-env
+    - tarifas-norteia
+    - eu-ai-act-sources
+  templates:
+    - matriz-decision
+    - pre-mortem
+    - steel-man
+    - checklist-deploy
+    - auditoria-output
+
+phase_mapping:
+  description: "Mapeo opcional de fases Cognito a workflow NorteIA"
+  discovery: "Lead + briefing + pre-auditoría"
+  planning: "Propuesta + Plan Director + matriz"
+  execution: "Implementación + formación + auditoría técnica"
+  review: "Entrega + retro"
+  shipping: "Cierre + handoff + facturación"
+
+integrations:
+  sinapsis:
+    enabled: true
+    delegate:
+      - instinct-observation
+      - instinct-learning
+      - knowledge-index
+
+preferences:
+  verbosity: medium
+  announce_mode_change: on-change
+  announce_phase_change: true
+  auto_suggest_phase_change: true
+  allow_auto_phase_change: false
+
+notes: |
+  Este perfil asume que el operador ya tiene context dense:
+  stack NorteIA, marcas, tarifas, EU AI Act, etc.
+
+  Los gates están calibrados para este contexto.
+  Las plantillas usan tono técnico, sin explicaciones básicas.

@@ -1,0 +1,87 @@
+{
+  "version": "1.0.0",
+  "description": "Reglas que consumen los hooks deterministas. Editables por el usuario para customizar detección de fase y gates.",
+  "phaseDetection": {
+    "description": "Señales detectables en los mensajes del usuario que sugieren cambio de fase. El hook SUGIERE, no aplica.",
+    "rules": [
+      {"signal": "vamos a ejecutar", "suggestPhase": "execution", "confidence": "high"},
+      {"signal": "implementa", "suggestPhase": "execution", "confidence": "high"},
+      {"signal": "construye", "suggestPhase": "execution", "confidence": "medium"},
+      {"signal": "despliega", "suggestPhase": "shipping", "confidence": "high"},
+      {"signal": "ship it", "suggestPhase": "shipping", "confidence": "high"},
+      {"signal": "review", "suggestPhase": "review", "confidence": "medium"},
+      {"signal": "qué aprendimos", "suggestPhase": "review", "confidence": "high"},
+      {"signal": "post-mortem", "suggestPhase": "review", "confidence": "high"},
+      {"signal": "retrospectiva", "suggestPhase": "review", "confidence": "high"},
+      {"signal": "vamos a planificar", "suggestPhase": "planning", "confidence": "high"},
+      {"signal": "tenemos los requisitos", "suggestPhase": "planning", "confidence": "medium"},
+      {"signal": "exploremos", "suggestPhase": "discovery", "confidence": "high"},
+      {"signal": "qué se me escapa", "suggestPhase": "discovery", "confidence": "medium"},
+      {"signal": "rompe el ancla", "suggestPhase": "discovery", "confidence": "high"},
+      {"signal": "nuevo proyecto", "suggestPhase": "discovery", "confidence": "high"}
+    ]
+  },
+  "gates": {
+    "description": "Anti-patrones que el gate-validator bloquea antes de Write/Edit. Cada gate tiene pattern regex y mensaje explicativo.",
+    "rules": [
+      {
+        "id": "n8n-retired",
+        "pattern": "(n8n|workflows/.*\\.json|n8n-workflow)",
+        "filesAffected": ["*.json", "*.md", "*.ts", "*.js"],
+        "action": "warn-and-confirm",
+        "message": "n8n está retirado del stack (decisión d004 en operator-state). Sugerencia: desarrollo propio + plugins Claude Code. Si es emergencia cliente en producción, confirma con override.",
+        "override": "/cognition-gate override n8n-retired"
+      },
+      {
+        "id": "rls-supabase-required",
+        "pattern": "(CREATE TABLE|create\\.table|\\.from\\(')",
+        "filesAffected": ["*.sql", "migrations/*.ts"],
+        "action": "warn",
+        "message": "Supabase requiere RLS en TODAS las tablas. Verifica que incluyes políticas RLS en esta migración.",
+        "override": null
+      },
+      {
+        "id": "no-hardcode-pii",
+        "pattern": "(email|telefono|phone|dni|nif|cif)[\\s]*=[\\s]*['\"][^'\"]+['\"]",
+        "filesAffected": ["*.ts", "*.tsx", "*.js", "*.py"],
+        "action": "block",
+        "message": "Parece que hay PII hardcodeada. Usa variables de entorno o parámetros. Si es un test, añade comentario // test-fixture.",
+        "override": "/cognition-gate override no-hardcode-pii"
+      },
+      {
+        "id": "no-commit-env",
+        "pattern": ".",
+        "filesAffected": [".env", ".env.*", "*.env"],
+        "action": "block",
+        "message": "Nunca commitees .env. Usa .env.example con valores vacíos.",
+        "override": null
+      },
+      {
+        "id": "operator-pricing-check",
+        "pattern": "(tarifa|precio|pricing|coste|€/h|\\$/h)",
+        "filesAffected": ["*.md", "*.docx"],
+        "action": "warn",
+        "message": "Propuesta con tarifas detectada. Verifica contra tu tabla de tarifas vigente antes de enviarla. Personaliza este gate en profiles/operator.yaml.",
+        "override": null
+      },
+      {
+        "id": "compliance-sources-required",
+        "pattern": "(EU AI Act|AI Act|GDPR|HIPAA|PCI|SOC2|reglamento|regulation)",
+        "filesAffected": ["*.md", "*.docx"],
+        "action": "warn",
+        "message": "Mención regulatoria detectada. Añade cita explícita a la fuente oficial (ej: artificialintelligenceact.eu para EU AI Act, edpb.europa.eu para GDPR).",
+        "override": null
+      }
+    ]
+  },
+  "anchorDetection": {
+    "description": "Señales de fijación cognitiva que sugieren activar modo Divergente.",
+    "rules": [
+      {"pattern": "voy a hacer [X]", "activate": "divergente", "confidence": "high"},
+      {"pattern": "mi plan es", "activate": "divergente", "confidence": "medium"},
+      {"pattern": "ya tengo decidido", "activate": "divergente", "confidence": "high"},
+      {"pattern": "creo que la mejor opción", "activate": "divergente", "confidence": "high"},
+      {"pattern": "se me ocurre que", "activate": "divergente", "confidence": "medium"}
+    ]
+  }
+}

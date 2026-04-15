@@ -1,0 +1,98 @@
+---
+# Perfil: Client
+# Target: cliente B2B en proyecto de transformación digital
+profile: client
+version: 1.0.0
+description: "Cliente B2B de NorteIA en transformación digital. Configurable por intake. Incluye reporting orientado a cliente."
+
+audience:
+  - Clientes NorteIA en proyectos de 3-12 meses
+  - Empresas en transformación digital guiada
+  - Equipos mixtos (IT + negocio) trabajando con Claude Code
+
+assumes:
+  sinapsis: false  # cliente puede no tenerlo instalado
+  skill_router: false
+  skills_personales: false
+  language: "es-ES | en-US (según cliente)"
+  technical_level: "varies (configurable por intake)"
+
+installs:
+  modes:
+    - divergente
+    - devils-advocate
+    - consolidador
+    - ejecutor
+    - auditor
+  hooks:
+    - phase-detector
+    - mode-injector
+    - gate-validator
+    - session-closer
+  gates:
+    # Configurables desde intake del cliente
+    - placeholder-client-gates
+  templates:
+    - matriz-decision
+    - pre-mortem
+    - checklist-deploy
+    - auditoria-output
+    - client-reporting  # nueva, específica del perfil
+
+extras:
+  - client-reporting-template.md
+  - weekly-digest-template.md
+  - handoff-template.md
+
+intake_required:
+  description: "Variables configurables vía archivo client-intake.json en instalación"
+  fields:
+    - client_name
+    - client_industry
+    - client_stack
+    - client_compliance  # GDPR, HIPAA, PCI, EU AI Act, etc.
+    - client_brand_colors
+    - client_brand_voice
+    - client_reporting_frequency  # weekly | biweekly | monthly
+    - client_stakeholders
+    - custom_gates  # anti-patrones específicos del cliente
+
+phase_mapping:
+  description: "Mapeo cliente B2B"
+  discovery: "Kickoff + Discovery"
+  planning: "Roadmap + Technical Plan"
+  execution: "Development Sprints"
+  review: "Sprint Review + QA"
+  shipping: "Release + Handoff"
+
+reporting:
+  weekly_digest: true
+  phase_change_notification: true
+  incident_report_auto: true
+  client_readable_audit: true  # templates/auditoria-output usa lenguaje no-técnico si aplica
+
+preferences:
+  verbosity: "medium-high"  # más explicaciones porque hay stakeholders no-técnicos
+  announce_mode_change: on-change
+  announce_phase_change: true
+  auto_suggest_phase_change: true
+  allow_auto_phase_change: false
+  client_friendly_language: true
+
+notes: |
+  Perfil orientado a cliente B2B de NorteIA.
+
+  Clave: intake del cliente determina configuración:
+  - gates específicos del cliente
+  - compliance requirements
+  - brand voice y tono en reporting
+  - frecuencia de digest
+
+  Este perfil NO incluye Estratega (se delega al consultor NorteIA)
+  ni Verificador (se combina con Ejecutor para simplificar).
+
+  Reporting incluye:
+  - Weekly digest al stakeholder principal
+  - Notificación automática de cambios de fase
+  - Handoff doc al final de Shipping
+  - Auditoría de calidad en lenguaje cliente-friendly

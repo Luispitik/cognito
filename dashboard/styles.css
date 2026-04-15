@@ -1,0 +1,99 @@
+/* Cognito dashboard — estilos complementarios a Tailwind CDN */
+
+/* Smoothing para tablas */
+table { border-collapse: collapse; }
+table tbody tr { border-bottom: 1px solid #f1f5f9; }
+table tbody tr:last-child { border-bottom: none; }
+
+/* Badges y chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.chip.ok { background: #d1fae5; color: #065f46; }
+.chip.warn { background: #fef3c7; color: #92400e; }
+.chip.err { background: #fee2e2; color: #991b1b; }
+.chip.accent { background: #e0f2fe; color: #075985; }
+
+/* KPI card */
+.kpi {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+}
+.kpi .label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+.kpi .value {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+  margin-top: 0.25rem;
+  color: #0f172a;
+}
+.kpi .sub {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+/* Fase pill */
+.phase-pill {
+  display: inline-block;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: #e0f2fe;
+  color: #075985;
+  text-transform: capitalize;
+}
+.phase-pill[data-phase="execution"] { background: #fef3c7; color: #92400e; }
+.phase-pill[data-phase="shipping"] { background: #d1fae5; color: #065f46; }
+.phase-pill[data-phase="review"] { background: #ede9fe; color: #5b21b6; }
+.phase-pill[data-phase="planning"] { background: #ffe4e6; color: #9f1239; }
+
+/* Gate row */
+.gate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  border-bottom: 1px dashed #e2e8f0;
+}
+.gate-row:last-child { border-bottom: none; }
+.gate-row code {
+  font-size: 0.75rem;
+  color: #475569;
+}
+.gate-row .count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}

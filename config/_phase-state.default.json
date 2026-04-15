@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "description": "Default de phase-state. Se copia a _phase-state.json en instalación.",
+  "current": "discovery",
+  "since": "2026-04-15T00:00:00Z",
+  "previousPhases": [],
+  "overrideModes": [],
+  "sessionId": null,
+  "lastUpdatedBy": "install-default"
+}

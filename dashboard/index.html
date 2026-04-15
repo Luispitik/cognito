@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cognito · Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ink': '#0f172a',
+            'paper': '#f8fafc',
+            'accent': '#0ea5e9',
+            'accent-2': '#8b5cf6',
+            'ok': '#10b981',
+            'warn': '#f59e0b',
+            'err': '#ef4444',
+            'muted': '#64748b',
+          },
+          fontFamily: {
+            'display': ['ui-serif', 'Georgia', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-paper text-ink min-h-screen">
+  <header class="border-b border-slate-200 bg-white sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-ink text-paper font-display text-lg flex items-center justify-center">
+          C
+        </div>
+        <div>
+          <h1 class="font-display text-xl">Cognito</h1>
+          <p class="text-xs text-muted">Cognitive Operating System</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-sm">
+        <div id="status-phase" class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-accent"></span>
+          <span class="text-muted">Cargando…</span>
+        </div>
+        <div id="status-profile" class="text-muted hidden md:block"></div>
+        <button id="btn-refresh" class="px-3 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50 text-sm transition">
+          ↻ Refrescar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+    <!-- Intro line -->
+    <div class="flex items-baseline justify-between">
+      <div>
+        <h2 class="font-display text-3xl">Estado del sistema</h2>
+        <p class="text-muted text-sm">Datos consolidados desde <code id="data-source" class="text-xs bg-slate-100 px-1.5 rounded"></code></p>
+      </div>
+      <p id="generated-at" class="text-xs text-muted"></p>
+    </div>
+
+    <!-- KPI cards -->
+    <section id="kpis" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <!-- Populated by JS -->
+    </section>
+
+    <!-- Charts row -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold">Uso por modo</h3>
+          <span class="text-xs text-muted">Total inyecciones</span>
+        </div>
+        <canvas id="chart-modes" height="180"></canvas>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold">Sesiones por fase</h3>
+          <span class="text-xs text-muted">Al cerrar sesión</span>
+        </div>
+        <canvas id="chart-phases" height="180"></canvas>
+      </div>
+    </section>
+
+    <!-- Activity + Gates -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 lg:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold">Actividad reciente</h3>
+          <span class="text-xs text-muted">Últimos 30 días</span>
+        </div>
+        <canvas id="chart-timeline" height="120"></canvas>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold">Gates disparados</h3>
+          <span class="text-xs text-muted">Top 10</span>
+        </div>
+        <div id="gates-list" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <!-- Sinapsis bridge -->
+    <section id="sinapsis-section" class="bg-white rounded-xl border border-slate-200 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 class="font-semibold">Integración Sinapsis</h3>
+          <p class="text-xs text-muted">Bridge opcional con aprendizaje continuo</p>
+        </div>
+        <div id="sinapsis-badge"></div>
+      </div>
+      <div id="sinapsis-details" class="text-sm text-muted"></div>
+    </section>
+
+    <!-- Recent sessions -->
+    <section class="bg-white rounded-xl border border-slate-200 p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold">Sesiones recientes</h3>
+        <span class="text-xs text-muted">Últimas 20</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-200 text-left text-muted text-xs uppercase">
+              <th class="pb-2 font-medium">Session ID</th>
+              <th class="pb-2 font-medium">Cerrada</th>
+              <th class="pb-2 font-medium">Fase</th>
+              <th class="pb-2 font-medium text-right">Gates</th>
+              <th class="pb-2 font-medium text-right">Inyecciones</th>
+              <th class="pb-2 font-medium text-right">Detecciones</th>
+            </tr>
+          </thead>
+          <tbody id="sessions-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="pt-8 pb-4 text-center text-xs text-muted">
+      Cognito v1.0.0 · <a href="https://github.com/Luispitik/cognito" class="underline">GitHub</a> · MIT License
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

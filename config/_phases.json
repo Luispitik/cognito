@@ -1,0 +1,110 @@
+{
+  "version": "1.0.0",
+  "description": "Definición de las 5 fases del proyecto. Cada fase define qué modos están activos por defecto y qué hooks se aplican con más intensidad.",
+  "phases": {
+    "discovery": {
+      "displayName": "Discovery",
+      "description": "Entender el problema, explorar el espacio de soluciones, evitar cerrarse pronto.",
+      "defaultModes": ["divergente", "estratega"],
+      "hookIntensity": {
+        "phase-detector": "normal",
+        "mode-injector": "high",
+        "gate-validator": "low",
+        "session-closer": "normal"
+      },
+      "primaryTemplates": [],
+      "exitSignals": [
+        "tenemos los requisitos",
+        "vamos a planificar",
+        "suficiente exploración"
+      ],
+      "reminder": "Aún es pronto para cerrar opciones. Diverge antes de converger."
+    },
+    "planning": {
+      "displayName": "Planning",
+      "description": "Decidir qué hacer, anticipar fallos, consolidar trade-offs.",
+      "defaultModes": ["devils-advocate", "consolidador", "estratega"],
+      "hookIntensity": {
+        "phase-detector": "normal",
+        "mode-injector": "high",
+        "gate-validator": "medium",
+        "session-closer": "normal"
+      },
+      "primaryTemplates": ["templates/pre-mortem.md", "templates/matriz-decision.md"],
+      "exitSignals": [
+        "vamos a ejecutar",
+        "plan aprobado",
+        "manos a la obra",
+        "implementa"
+      ],
+      "reminder": "Antes de ejecutar: pre-mortem + matriz decisión + plan B."
+    },
+    "execution": {
+      "displayName": "Execution",
+      "description": "Construir según plan sin desviarse; verificar sobre la marcha.",
+      "defaultModes": ["ejecutor", "verificador"],
+      "hookIntensity": {
+        "phase-detector": "high",
+        "mode-injector": "high",
+        "gate-validator": "high",
+        "session-closer": "normal"
+      },
+      "primaryTemplates": ["templates/checklist-deploy.md"],
+      "exitSignals": [
+        "hemos terminado",
+        "hora de revisar",
+        "ship it",
+        "review"
+      ],
+      "reminder": "Sin ideación libre. Si aparece sorpresa, vuelve a Discovery explícitamente."
+    },
+    "review": {
+      "displayName": "Review",
+      "description": "Revisar lo hecho, extraer aprendizajes, preparar cierre.",
+      "defaultModes": ["auditor", "devils-advocate"],
+      "hookIntensity": {
+        "phase-detector": "normal",
+        "mode-injector": "high",
+        "gate-validator": "medium",
+        "session-closer": "high"
+      },
+      "primaryTemplates": ["templates/auditoria-output.md"],
+      "exitSignals": [
+        "listo para entregar",
+        "vamos a shipping",
+        "aprendizajes capturados"
+      ],
+      "reminder": "No entres en nuevas features. Auditar lo hecho y capturar lessons."
+    },
+    "shipping": {
+      "displayName": "Shipping",
+      "description": "Entregar con máxima fiabilidad. Determinismo máximo.",
+      "defaultModes": ["ejecutor", "verificador"],
+      "hookIntensity": {
+        "phase-detector": "low",
+        "mode-injector": "high",
+        "gate-validator": "maximum",
+        "session-closer": "high"
+      },
+      "primaryTemplates": ["templates/checklist-deploy.md"],
+      "exitSignals": [
+        "entregado",
+        "cerrado",
+        "siguiente proyecto"
+      ],
+      "reminder": "Solo ejecución verificada. Cualquier duda: posponer y volver a Review."
+    }
+  },
+  "transitions": {
+    "description": "Todas las transiciones son válidas. Cognito no impone workflow rígido. Las transiciones más comunes se listan aquí.",
+    "common": [
+      ["discovery", "planning"],
+      ["planning", "execution"],
+      ["execution", "review"],
+      ["review", "shipping"],
+      ["shipping", "discovery"],
+      ["execution", "discovery"],
+      ["review", "planning"]
+    ]
+  }
+}

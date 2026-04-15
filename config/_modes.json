@@ -1,0 +1,164 @@
+{
+  "version": "1.0.0",
+  "description": "Definición de los 7 modos de pensamiento de Cognito. Cada modo tiene triggers (para auto-activación), plantilla (si aplica), y nivel de determinismo.",
+  "modes": {
+    "divergente": {
+      "displayName": "Divergente",
+      "description": "Anti-ancla, ideación, exploración de alternativas con 10 marcos mentales.",
+      "skillPath": "modes/divergente/SKILL.md",
+      "determinism": "low",
+      "template": null,
+      "triggers": {
+        "phrases": [
+          "voy a hacer",
+          "estoy pensando en",
+          "creo que la mejor opción",
+          "se me ocurre",
+          "mi plan es",
+          "ya tengo decidido",
+          "ayúdame a pensar",
+          "qué se me escapa",
+          "qué no estoy viendo",
+          "explora alternativas",
+          "rompe el ancla",
+          "diverge",
+          "pensamiento lateral",
+          "brainstorm",
+          "lluvia de ideas"
+        ],
+        "contexts": ["naming", "pricing", "posicionamiento", "arquitectura", "trade-offs"],
+        "conversationalPatterns": ["3+ turnos misma solución", "defensa sin evaluación", "variaciones menores"]
+      },
+      "defaultPhases": ["discovery"]
+    },
+    "verificador": {
+      "displayName": "Verificador",
+      "description": "Fact-check, anti-alucinación, validación de afirmaciones antes de acción.",
+      "skillPath": "modes/verificador/SKILL.md",
+      "determinism": "high",
+      "template": null,
+      "gateHook": "gate-validator.sh",
+      "triggers": {
+        "phrases": [
+          "¿estás seguro?",
+          "verifica",
+          "confirma",
+          "valida",
+          "comprueba",
+          "¿es cierto que?",
+          "demuestra"
+        ],
+        "contexts": ["claims factuales", "antes de deploy", "antes de escribir código crítico"],
+        "conversationalPatterns": ["afirmación sin fuente", "cifra sin origen"]
+      },
+      "defaultPhases": ["execution", "shipping"]
+    },
+    "devils-advocate": {
+      "displayName": "Devil's Advocate",
+      "description": "Pre-mortem, steel-man del opuesto, crítica estructurada.",
+      "skillPath": "modes/devils-advocate/SKILL.md",
+      "determinism": "medium",
+      "template": "templates/pre-mortem.md",
+      "triggers": {
+        "phrases": [
+          "qué puede salir mal",
+          "pre-mortem",
+          "argumenta en contra",
+          "steel-man",
+          "por qué esto fracasaría",
+          "devil's advocate",
+          "contradice",
+          "critica"
+        ],
+        "contexts": ["antes de commit grande", "antes de lanzamiento", "propuestas comerciales"],
+        "conversationalPatterns": ["optimismo excesivo", "ausencia de plan B"]
+      },
+      "defaultPhases": ["planning", "review"]
+    },
+    "consolidador": {
+      "displayName": "Consolidador",
+      "description": "Convergencia explícita, matriz de decisión, síntesis.",
+      "skillPath": "modes/consolidador/SKILL.md",
+      "determinism": "medium",
+      "template": "templates/matriz-decision.md",
+      "triggers": {
+        "phrases": [
+          "decide",
+          "elige",
+          "cuál eliges",
+          "qué recomiendas",
+          "consolida",
+          "matriz de decisión",
+          "trade-offs"
+        ],
+        "contexts": ["post-divergencia", "final de planning"],
+        "conversationalPatterns": ["múltiples opciones sin decisión", "parálisis por análisis"]
+      },
+      "defaultPhases": ["planning"]
+    },
+    "ejecutor": {
+      "displayName": "Ejecutor",
+      "description": "Checklists rígidas, plantillas fijas, foco sin desviación.",
+      "skillPath": "modes/ejecutor/SKILL.md",
+      "determinism": "high",
+      "template": "templates/checklist-deploy.md",
+      "gateHook": "gate-validator.sh",
+      "triggers": {
+        "phrases": [
+          "vamos a ejecutar",
+          "implementa",
+          "construye",
+          "code it",
+          "despliega",
+          "ship it",
+          "ejecuta"
+        ],
+        "contexts": ["fase execution", "fase shipping", "MVP clear"],
+        "conversationalPatterns": ["requisitos claros", "no hay trade-offs pendientes"]
+      },
+      "defaultPhases": ["execution", "shipping"]
+    },
+    "estratega": {
+      "displayName": "Estratega",
+      "description": "Time-horizon shift, cambio de stakeholder, trade-offs macro.",
+      "skillPath": "modes/estratega/SKILL.md",
+      "determinism": "low",
+      "template": null,
+      "triggers": {
+        "phrases": [
+          "a largo plazo",
+          "dentro de 5 años",
+          "visión",
+          "estrategia",
+          "posicionamiento",
+          "stakeholder",
+          "macro"
+        ],
+        "contexts": ["decisiones de marca", "roadmap", "pricing"],
+        "conversationalPatterns": ["decisión táctica con impacto estratégico"]
+      },
+      "defaultPhases": ["discovery", "planning"]
+    },
+    "auditor": {
+      "displayName": "Auditor",
+      "description": "Post-mortem, QA de outputs, extracción de lessons learned.",
+      "skillPath": "modes/auditor/SKILL.md",
+      "determinism": "high",
+      "template": "templates/auditoria-output.md",
+      "triggers": {
+        "phrases": [
+          "audita",
+          "revisa",
+          "qué aprendimos",
+          "post-mortem",
+          "retro",
+          "lessons learned",
+          "review"
+        ],
+        "contexts": ["fase review", "fin de sprint", "después de entrega"],
+        "conversationalPatterns": ["proyecto cerrado", "algo salió mal"]
+      },
+      "defaultPhases": ["review"]
+    }
+  }
+}

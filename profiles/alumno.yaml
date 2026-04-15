@@ -1,0 +1,69 @@
+---
+# Perfil: Alumno
+# Target: alumno de formación FUNDAE / curso Claude Code / similar
+profile: alumno
+version: 1.0.0
+description: "Alumno en proceso de formación. MVP pedagógico con 4 modos, explicaciones extendidas, sin contexto NorteIA específico."
+
+audience:
+  - Alumnos cursos FUNDAE NorteIA
+  - Alumnos autoformación Claude Code
+  - Personas recién introducidas al pensamiento cognitivo estructurado
+
+assumes:
+  sinapsis: false
+  skill_router: false
+  skills_personales: false
+  language: es-ES
+  technical_level: "beginner-intermediate"
+
+installs:
+  modes:
+    - divergente
+    - verificador
+    - consolidador
+    - ejecutor
+  hooks:
+    - mode-injector
+    - gate-validator
+  gates:
+    - generic-best-practices
+    - no-commit-env
+  templates:
+    - matriz-decision
+    - checklist-deploy
+
+extras:
+  - onboarding-tutorial.md
+  - glosario-modos.md
+  - ejercicios-guiados.md
+
+phase_mapping:
+  description: "Mapeo pedagógico simplificado"
+  discovery: "Exploración"
+  planning: "Decisión"
+  execution: "Construcción"
+  review: "Revisión"
+  shipping: "Entrega"
+
+preferences:
+  verbosity: high
+  announce_mode_change: always
+  announce_phase_change: true
+  auto_suggest_phase_change: true
+  allow_auto_phase_change: false
+  explain_first_use: true
+
+educational_extras:
+  - Explicar qué hace cada modo la primera vez que se activa
+  - Sugerir ejercicios cuando se entra a una fase nueva
+  - Glosario disponible con `/modo help [nombre]`
+
+notes: |
+  MVP pedagógico: 4 modos core (Divergente, Verificador, Consolidador, Ejecutor).
+  Devil's Advocate, Estratega y Auditor se introducen en segunda etapa.
+
+  Plantillas y explicaciones están verbalizadas para alguien que aprende.
+  Gates son genéricos, no específicos de stack/empresa.
+
+  Incluye ejercicios guiados que el alumno puede correr.

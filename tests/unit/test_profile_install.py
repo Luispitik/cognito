@@ -46,6 +46,9 @@ def install_into(tmp_path):
     path translation issues on Windows (absolute paths with spaces break).
     HOME and --target are converted to Git Bash /c/... form on Windows so that
     install.sh's internal mkdir/cp operate in the expected directory.
+
+    For profile=client, a minimal intake.json is created in tmp_path and passed
+    via --client-intake (required since the v1.0 fix 044d4c4).
     """
     def _install(profile: str):
         target = tmp_path / "cognito"
@@ -53,11 +56,23 @@ def install_into(tmp_path):
         (home / ".claude").mkdir(parents=True, exist_ok=True)
         env = os.environ.copy()
         env["HOME"] = _to_bash_path(home)
+
+        args = ["bash", "scripts/install.sh",
+                f"--profile={profile}",
+                f"--target={_to_bash_path(target)}",
+                "--skip-settings"]
+
+        if profile == "client":
+            intake = tmp_path / "intake.json"
+            intake.write_text(json.dumps({
+                "client_name": "Test Client",
+                "client_industry": "tech",
+                "client_stack": ["next.js", "supabase"],
+            }), encoding="utf-8")
+            args.append(f"--client-intake={_to_bash_path(intake)}")
+
         result = subprocess.run(
-            ["bash", "scripts/install.sh",
-             f"--profile={profile}",
-             f"--target={_to_bash_path(target)}",
-             "--skip-settings"],
+            args,
             capture_output=True,
             text=True,
             env=env,

@@ -63,12 +63,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Run ShellCheck on hooks
-        uses: ludeeus/action-shellcheck@master
+        uses: ludeeus/action-shellcheck@2.0.0
         with:
           scandir: ./hooks
           severity: warning
       - name: Run ShellCheck on scripts
-        uses: ludeeus/action-shellcheck@master
+        uses: ludeeus/action-shellcheck@2.0.0
         with:
           scandir: ./scripts
           severity: warning

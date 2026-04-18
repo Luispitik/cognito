@@ -1,104 +1,129 @@
-# Cognito — Instalación
+# Cognito — Installation
 
-> **Nota**: Los ejemplos de `git clone` usan `<YOUR_GITHUB_USER>` como placeholder. Reemplázalo por el fork del usuario o por el repo canónico cuando esté publicado.
+> Canonical repo: [github.com/Luispitik/cognito](https://github.com/Luispitik/cognito). Replace with your fork URL if you are working from a fork.
 
-## Requisitos
+## Requirements
 
-- Claude Code CLI instalado.
-- Bash disponible (Git Bash en Windows, nativo en macOS/Linux).
-- `jq` para manipular JSON (recomendado, no obligatorio).
-- Python 3.8+ (opcional, para hooks Python).
+- **Claude Code CLI** installed.
+- **Bash** (Git Bash on Windows, native on macOS / Linux).
+- **Python 3.10+** — hard requirement. Hooks and the install script spawn `python3` and rely on PEP 604 syntax. On Windows, use Python from python.org and make sure `python3` is on `PATH` (not just `python`).
+- **jq** — strongly recommended. Enables automatic hook registration in `~/.claude/settings.json`. Without jq, install prints a paste-ready snippet you can merge manually.
 
----
+## Install in one line
 
-## Instalación por perfil
-
-Elige el perfil que mejor encaje con tu caso de uso.
-
-### Perfil `operator` — Founder/consultor Claude Code avanzado
-
-**Asume**: Sinapsis instalado, skills personales existentes, lenguaje denso.
+Pick the profile that matches your context:
 
 ```bash
-# 1. Clonar
-git clone https://github.com/<YOUR_GITHUB_USER>/cognito.git ~/cognito
+# Clone
+git clone https://github.com/Luispitik/cognito.git ~/cognito
+cd ~/cognito
 
-# 2. Instalar globalmente
-cp -r ~/cognito ~/.claude/cognito
+# Choose a profile
+bash scripts/install.sh --profile=operator   # founder / advanced operator
+bash scripts/install.sh --profile=alumno     # pedagogical MVP (4 modes)
+bash scripts/install.sh --profile=public     # open-source, generic
+bash scripts/install.sh --profile=client --client-intake=./client-intake.json
+```
 
-# 3. Registrar hooks en settings.json
-cat ~/cognito/profiles/operator.hooks.json >> ~/.claude/settings.json
-# Edita settings.json y fusiona correctamente (ver ejemplo abajo)
+`install.sh` will:
 
-# 4. Registrar commands
-cp ~/cognito/commands/*.md ~/.claude/commands/
+1. Validate your profile and Python version.
+2. Parse `profiles/<profile>.yaml` and copy only the modes, hooks, gates and templates listed there.
+3. Install mode skills to `~/.claude/skills/` and slash commands to `~/.claude/commands/`.
+4. Seed `~/.claude/cognito/` with the chosen profile's config.
+5. Merge hook registrations into `~/.claude/settings.json` using `jq` (or print the snippet if jq is absent).
+6. Back up any existing install into `~/.claude/cognito-backups/<timestamp>/` and preserve your `_phase-state.json`.
 
-# 5. Inicializar estado
-cp ~/cognito/config/_phase-state.default.json ~/.claude/cognito/config/_phase-state.json
+Then open a new Claude Code session and run `/cognition-status`.
 
-# 6. Verificar
-# En una sesión nueva de Claude Code:
+## What each profile installs
+
+| Profile | Modes | Hooks | Gates |
+|---|---|---|---|
+| `operator` | 7 | 4 (phase-detector, mode-injector, gate-validator, session-closer) | 6 (incl. `no-commit-env`, `rls-supabase-required`, `eu-ai-act-sources`) |
+| `alumno` | 4 (Divergente, Verificador, Consolidador, Ejecutor) | 2 (mode-injector, gate-validator) | 2 (`generic-best-practices`, `no-commit-env`) |
+| `public` | 7 | 2 (mode-injector, session-closer) | 0 (user defines their own) |
+| `client` | 5 | 4 | configurable via `--client-intake=FILE` |
+
+See the YAML under `profiles/<name>.yaml` for the authoritative list; `install.sh` parses them at runtime.
+
+## Install options
+
+```
+--profile=NAME           operator | alumno | public | client   (required)
+--target=PATH            install dir (default: ~/.claude/cognito)
+--settings=PATH          settings.json to modify (default: ~/.claude/settings.json)
+--skip-settings          do not touch settings.json; print the snippet instead
+--client-intake=PATH     intake JSON (only for --profile=client)
+```
+
+## Verify
+
+```bash
+# Re-open Claude Code, then:
 /cognition-status
+/cognition-status --verify   # health check (v1.1+)
 ```
 
-### Perfil `alumno` — Alumno de formación corporativa / formación
+A healthy install reports:
 
-**Asume**: Claude Code recién instalado, sin Sinapsis, necesita explicaciones.
+```
+Cognito status
+  profile : operator
+  phase   : discovery
+  modes   : 7 installed, 2 default-active in this phase
+  hooks   : 4/4 registered
+  gates   : 6 enabled, 0 disabled
+  bridge  : Sinapsis available v4.3
+```
+
+## Update
 
 ```bash
-git clone https://github.com/<YOUR_GITHUB_USER>/cognito.git ~/cognito
-bash ~/cognito/scripts/install.sh --profile=alumno
+cd ~/cognito
+git pull
+bash scripts/update.sh              # non-destructive refresh
+bash scripts/update.sh --dry-run    # preview changes
 ```
 
-Instala **4 modos pedagógicos** (Divergente, Verificador, Consolidador, Ejecutor) y 2 hooks. Incluye `onboarding-tutorial.md` que Claude lee en la primera sesión para explicar cómo funciona.
+`update.sh` refreshes hooks, templates, phases, `SKILL.md` and the Sinapsis bridge from the repo. It **never** touches your `_phase-state.json`, `_operator-config.json`, `logs/`, or `sessions/`.
 
-### Perfil `public` — Open source / genérico
-
-**Asume**: Sin contexto del operador, portabilidad máxima.
+## Uninstall
 
 ```bash
-git clone https://github.com/<YOUR_GITHUB_USER>/cognito.git
-cd cognito
-./scripts/install.sh --profile=public
+bash scripts/uninstall.sh
+# or
+bash scripts/uninstall.sh --yes --target=~/.claude/cognito
 ```
 
-Instala los 7 modos con lenguaje neutro (sin referencias operator), sin gates específicos.
+`uninstall.sh` removes the install directory, the 10 Cognito slash commands, the 7 mode skills, and — when jq is available — strips every `cognito-*` entry from `~/.claude/settings.json`.
 
-### Perfil `client` — Cliente B2B
+## Manual installation (no script)
 
-**Asume**: Cliente el operador en proyecto de transformación digital.
+If you prefer not to run the installer, follow these steps:
+
+### 1. Copy files
 
 ```bash
-./scripts/install.sh --profile=client --client-intake=./client-intake.json
+mkdir -p ~/.claude/cognito/{config,hooks,logs,sessions,templates,phases,integrations}
+
+cp -r ~/cognito/hooks/*.sh          ~/.claude/cognito/hooks/
+cp ~/cognito/config/*.json          ~/.claude/cognito/config/
+cp ~/cognito/config/_phase-state.default.json ~/.claude/cognito/config/_phase-state.json
+cp -r ~/cognito/templates           ~/.claude/cognito/
+cp -r ~/cognito/phases              ~/.claude/cognito/
+cp -r ~/cognito/integrations/.      ~/.claude/cognito/integrations/
+cp ~/cognito/SKILL.md               ~/.claude/cognito/
+
+cp -r ~/cognito/modes/*             ~/.claude/skills/
+cp ~/cognito/commands/*.md          ~/.claude/commands/
+
+chmod +x ~/.claude/cognito/hooks/*.sh
 ```
 
-El archivo `client-intake.json` (generado durante onboarding del cliente) configura gates específicos del cliente (stack, compliance, branding).
+### 2. Register hooks in `~/.claude/settings.json`
 
----
-
-## Instalación manual (si el script no funciona)
-
-### Paso 1: copiar archivos
-
-```bash
-# Skills de modos → skills globales
-cp -r ~/cognito/modes/* ~/.claude/skills/
-
-# Commands → commands globales
-cp ~/cognito/commands/*.md ~/.claude/commands/
-
-# Config en directorio propio de Cognito
-mkdir -p ~/.claude/cognito
-cp -r ~/cognito/config ~/.claude/cognito/
-cp -r ~/cognito/hooks ~/.claude/cognito/
-cp -r ~/cognito/templates ~/.claude/cognito/
-cp -r ~/cognito/phases ~/.claude/cognito/
-cp ~/cognito/SKILL.md ~/.claude/cognito/
-```
-
-### Paso 2: registrar hooks en `~/.claude/settings.json`
-
-Añade en la clave `hooks`:
+Merge this block into the `hooks` key of your `settings.json` (adjust the path if you installed elsewhere):
 
 ```json
 {
@@ -108,14 +133,14 @@ Añade en la clave `hooks`:
         "name": "cognito-phase-detector",
         "command": "bash ~/.claude/cognito/hooks/phase-detector.sh",
         "blocking": false
-      }
-    ],
-    "PreToolUse": [
+      },
       {
         "name": "cognito-mode-injector",
         "command": "bash ~/.claude/cognito/hooks/mode-injector.sh",
         "blocking": false
-      },
+      }
+    ],
+    "PreToolUse": [
       {
         "name": "cognito-gate-validator",
         "command": "bash ~/.claude/cognito/hooks/gate-validator.sh",
@@ -134,90 +159,33 @@ Añade en la clave `hooks`:
 }
 ```
 
-### Paso 3: inicializar estado
-
-```bash
-cp ~/.claude/cognito/config/_phase-state.default.json ~/.claude/cognito/config/_phase-state.json
-chmod +x ~/.claude/cognito/hooks/*.sh
-```
-
-### Paso 4: verificar
-
-Inicia sesión Claude Code, escribe:
-
-```
-/cognition-status
-```
-
-Deberías ver:
-
-```
-╭─ Cognito Status ────────────────────────────╮
-│ Perfil: operator                             │
-│ Fase actual: discovery                       │
-│ Modos activos por defecto: Divergente, Estratega │
-│ Hooks registrados: 4/4 ✓                     │
-│ Gates activos: n8n, rls-supabase, tarifas    │
-│ Última sesión cerrada: 2026-04-15T14:32:00   │
-╰──────────────────────────────────────────────╯
-```
-
----
-
-## Desinstalación
-
-```bash
-# Borrar commands
-rm ~/.claude/commands/{fase,modo,cognition-status,divergir,verificar,devils-advocate,consolidar,ejecutar,estratega,auditar}.md
-
-# Borrar skills de modos
-rm -rf ~/.claude/skills/{divergente,verificador,devils-advocate,consolidador,ejecutor,estratega,auditor}
-
-# Borrar directorio Cognito
-rm -rf ~/.claude/cognito
-
-# Editar settings.json y quitar los bloques "cognito-*"
-```
-
----
+> Note: `mode-injector` lives on `UserPromptSubmit` since v1.1.0. Earlier versions registered it on `PreToolUse`, which caused redundant injection on every tool call.
 
 ## Troubleshooting
 
-### "/cognition-status no funciona"
-- Verifica que `~/.claude/commands/cognition-status.md` existe.
-- Cierra y reabre la sesión Claude Code (recarga commands).
+### `/cognition-status` does nothing
+- Re-open Claude Code (it reloads slash commands on session start).
+- Check `~/.claude/commands/cognition-status.md` exists.
 
-### "Los hooks no se disparan"
-- Verifica permisos: `chmod +x ~/.claude/cognito/hooks/*.sh`.
-- En Windows, usa Git Bash o WSL para ejecutar los `.sh`.
-- Revisa `~/.claude/settings.json` — los paths deben ser absolutos.
+### Hooks don't fire
+- `chmod +x ~/.claude/cognito/hooks/*.sh`.
+- Git Bash only on Windows — paths must be absolute in `settings.json`.
+- Run `/cognition-status --verify` to see which hooks the harness registered.
 
-### "El modo no se activa aunque hago /modo divergente"
-- Verifica que `~/.claude/skills/divergente/SKILL.md` existe.
-- Verifica que el command `/modo` está leyendo `_phase-state.json`.
-- Revisa el log de sesión en `~/.claude/cognito/logs/session-*.log`.
+### A mode doesn't activate when I type `/divergir`
+- `~/.claude/skills/divergente/SKILL.md` must exist.
+- `config/_operator-config.json → modes.disabled` must NOT list that mode.
 
-### "Gate bloquea cosas que no debería"
-- Edita `~/.claude/cognito/config/_passive-triggers.json → gates`.
-- Desactiva gates individuales con `/cognition-gate off <nombre>`.
+### A gate blocks something it shouldn't
+- Toggle via `/cognition-gate off <gate-id>` (or edit `_operator-config.json → gates.disabled`).
+- The PII gate (`no-hardcode-pii`) uses best-effort regex; see [SECURITY.md](SECURITY.md) → Known limitations.
 
----
+### Install failed with `python3: command not found`
+- Python 3.10+ is required. Install from python.org (Windows) and tick "Add to PATH".
+- Git Bash usually exposes `python3` when Python is on PATH; otherwise `alias python3=python` in `~/.bashrc`.
 
-## Actualización
+## Next steps
 
-```bash
-cd ~/cognito
-git pull
-bash scripts/update.sh
-```
-
-El script `update.sh` respeta customizaciones: solo actualiza archivos core, no tocando los que tengas modificados.
-
----
-
-## Próximos pasos
-
-- Lee [README.md](README.md) para visión general.
-- Lee [ARCHITECTURE.md](ARCHITECTURE.md) para decisiones técnicas.
-- Explora `modes/` para entender cada modo.
-- Prueba `/fase discovery` + `/divergir` en un problema real.
+- [README.md](README.md) — quick overview.
+- [ARCHITECTURE.md](ARCHITECTURE.md) — design decisions and v1.1 "known limitations".
+- Run `/fase discovery` + `/divergir` on a real problem to feel the difference.

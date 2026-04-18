@@ -123,10 +123,10 @@ La clave es: **la auto-detección sugiere, nunca decide**. El usuario mantiene a
 
 | Hook | Evento | Función | Editable por el usuario |
 |------|--------|---------|-------------------------|
-| `phase-detector.sh` | UserPromptSubmit | Detecta señales de cambio de fase y propone | Sí (reglas en `_passive-triggers.json`) |
-| `mode-injector.sh` | PreToolUse | Inyecta instrucciones del modo activo como systemMessage | No (lógica fija) |
+| `phase-detector.sh` | UserPromptSubmit | Detecta señales de cambio de fase y propone (word-boundary regex desde v1.1) | Sí (reglas en `_passive-triggers.json`) |
+| `mode-injector.sh` | **UserPromptSubmit** (desde v1.1; pre-1.1 usaba PreToolUse) | Inyecta instrucciones del modo activo como systemMessage, una vez por turno | No (lógica fija) |
 | `gate-validator.sh` | PreToolUse Write/Edit | Valida anti-patrones antes de escribir | Sí (reglas en `_passive-triggers.json → gates`) |
-| `session-closer.sh` | Stop | Log de modos/decisiones de la sesión | No (lógica fija) |
+| `session-closer.sh` | Stop | Cuenta métricas filtradas por session_id y rota logs a `logs/archive/` (desde v1.1) | No (lógica fija) |
 
 ---
 
@@ -291,3 +291,46 @@ Si una regla aparece en 3+ perfiles, subirla al core. Si solo en 1, dejarla en e
 
 ### Modos sin disparador claro
 Cada modo debe tener trigger detectable (verbalización + contexto). Si no, se convierte en ruido.
+
+---
+
+## 13. Known limitations (v1.1)
+
+v1.1.0 was the "Honest Release" — it closes the gap between the docs and the runtime. These limitations remain and are flagged for the v1.2 / v2.0 roadmap:
+
+### Mode taxonomy has overlap
+
+The 7 modes were designed from a catalogue of LLM biases, but in practice some pairs converge:
+
+- **Estratega** adds "time-horizon shift" and "stakeholder perspective" to the marcos catalogue. Both already appear as marcos H and I inside **Divergente**. Realistically they are one mode with two presets.
+- **Devil's Advocate** (pre-mortem) and **Auditor** (post-mortem) share the same template structure, changing only tense. Realistically one mode with a pre/post modifier.
+
+We kept the 7-mode API intact in v1.1 to avoid breaking skills/commands. v2.0 is the right moment to collapse.
+
+### "Determinismo selectivo" only applies to one hook
+
+Only `gate-validator.sh` implements a true block/allow gate. The other three hooks are:
+
+- `phase-detector.sh` — word-boundary regex suggestion, never forces.
+- `mode-injector.sh` — file concatenation with a size budget.
+- `session-closer.sh` — log partitioning and rotation, no runtime decision.
+
+The framing was overstated pre-v1.1. Useful orchestration, not a decision framework.
+
+### Phases × modes has three sources of truth
+
+The binding "phase X defaults to modes Y,Z" lives in three places that can drift apart:
+
+- `config/_phases.json → phases.<id>.defaultModes`
+- `config/_modes.json → modes.<id>.defaultPhases`
+- mode frontmatter in `modes/<id>/SKILL.md`
+
+There is no generator or test that enforces agreement today. v2.0 plans to collapse these into one source and generate the others.
+
+### PII gate (`no-hardcode-pii`) is narrow
+
+The default regex catches `const email = "foo@bar.com"` but misses JSON (`"email": "..."`), object shorthand, Python dicts without quotes, and most variants that are not literal `=` assignment. It is best-effort protection, not a compliance boundary. See [SECURITY.md → Known limitations](SECURITY.md). v1.2 plans to invoke `gitleaks` as a subprocess when available.
+
+### `hookIntensity` is dead configuration
+
+`_phases.json` declares per-phase `hookIntensity` (`low/medium/high`). No hook reads it. Kept for API stability; will be removed or wired up in v2.0.

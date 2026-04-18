@@ -33,8 +33,8 @@ export COGNITO_DIR_RESOLVED
 
 mkdir -p "$COGNITO_DIR_RESOLVED/logs" 2>/dev/null || true
 
-# Leer stdin completo
-INPUT_JSON=$(cat 2>/dev/null || echo "{}")
+# Stdin size cap (1 MiB) to protect against pathological payloads.
+INPUT_JSON=$(head -c 1048576 2>/dev/null || echo "{}")
 export INPUT_JSON
 
 # Toda la lógica en Python para evitar issues de interpolación bash
@@ -50,21 +50,31 @@ state_file = os.path.join(cognito_dir, "config", "_phase-state.json")
 triggers_file = os.path.join(cognito_dir, "config", "_passive-triggers.json")
 log_file = os.path.join(cognito_dir, "logs", "phase-detector.log")
 
-def log(msg):
-    try:
-        with open(log_file, "a", encoding="utf-8") as f:
-            ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-            f.write(f"[{ts}] {msg}\n")
-    except Exception:
-        pass
-
 # Parse input
 input_json = os.environ.get("INPUT_JSON", "{}")
 try:
     data = json.loads(input_json)
-    prompt = data.get("prompt", "") if isinstance(data, dict) else ""
+    if not isinstance(data, dict):
+        data = {}
 except (json.JSONDecodeError, TypeError):
-    prompt = ""
+    data = {}
+prompt = data.get("prompt", "") if isinstance(data.get("prompt"), str) else ""
+
+# session_id extracted and validated for log-line tagging.
+_SESSION_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
+_raw_sid = data.get("session_id") or data.get("sessionId") or ""
+if isinstance(_raw_sid, str) and _SESSION_ID_RE.match(_raw_sid):
+    SESSION_ID = _raw_sid
+else:
+    SESSION_ID = "unknown"
+
+def log(msg):
+    try:
+        with open(log_file, "a", encoding="utf-8") as f:
+            ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            f.write(f"[{ts}] [{SESSION_ID}] {msg}\n")
+    except Exception:
+        pass
 
 if not prompt:
     log("Sin prompt. Salgo.")
@@ -94,12 +104,25 @@ except (json.JSONDecodeError, IOError):
 
 prompt_lower = prompt.lower()
 
+def _matches_signal(signal: str, haystack: str) -> bool:
+    """Word-boundary match so that 'exploremos' does NOT match inside
+    'no exploremos eso'. v1.1.0 fix: pre-1.1 used plain substring,
+    which triggered false positives on negated prompts."""
+    if not signal:
+        return False
+    # re.escape to allow multi-word signals ("vamos a ejecutar") as well.
+    pattern = r"\b" + re.escape(signal) + r"\b"
+    try:
+        return bool(re.search(pattern, haystack))
+    except re.error:
+        return False
+
 # Detección de fase
 best_conf = {"high": 3, "medium": 2, "low": 1}
 best = None
 for rule in triggers.get("phaseDetection", {}).get("rules", []):
     signal = rule.get("signal", "").lower()
-    if signal and signal in prompt_lower:
+    if _matches_signal(signal, prompt_lower):
         conf = rule.get("confidence", "low")
         if best is None or best_conf.get(conf, 0) > best_conf.get(best["confidence"], 0):
             best = {
@@ -119,11 +142,19 @@ if best and best["suggestPhase"] != current_phase and best["confidence"] in ("hi
     print(json.dumps({"systemMessage": msg}))
     sys.exit(0)
 
-# Detección de ancla
+# Detección de ancla (with regex timeout protection — patterns come from
+# user-controlled config, so a malformed regex must not hang the hook).
 for rule in triggers.get("anchorDetection", {}).get("rules", []):
     pat = rule.get("pattern", "").lower().replace("[x]", ".+")
+    if not pat:
+        continue
     try:
-        if re.search(pat, prompt_lower):
+        compiled = re.compile(pat)
+    except re.error as exc:
+        log(f"Regex invalido en anchor rule '{rule.get('pattern')}': {exc}")
+        continue
+    try:
+        if compiled.search(prompt_lower):
             log(f'Ancla detectada: "{rule["pattern"]}" -> sugerir Divergente')
             msg = (
                 f'Cognito detecto posible ancla cognitiva ("{rule["pattern"]}"). '
@@ -131,7 +162,8 @@ for rule in triggers.get("anchorDetection", {}).get("rules", []):
             )
             print(json.dumps({"systemMessage": msg}))
             sys.exit(0)
-    except re.error:
+    except Exception as exc:  # noqa: BLE001
+        log(f"Error evaluando anchor rule: {exc}")
         continue
 
 log(f"Sin deteccion. Fase actual: {current_phase}")

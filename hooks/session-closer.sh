@@ -61,8 +61,14 @@ try:
 except (json.JSONDecodeError, TypeError):
     data = {}
 
-session_id = data.get("session_id") or data.get("sessionId")
-if not session_id:
+import re as _re
+_SESSION_ID_RE = _re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
+raw_session_id = data.get("session_id") or data.get("sessionId")
+if isinstance(raw_session_id, str) and _SESSION_ID_RE.match(raw_session_id):
+    session_id = raw_session_id
+else:
+    if raw_session_id:
+        log(f"session_id invalido (descartado): {raw_session_id!r}")
     now = datetime.now(timezone.utc)
     session_id = f"session-{now.strftime('%Y%m%d-%H%M%S')}"
 
@@ -104,10 +110,15 @@ record = {
     },
 }
 
-# Escribir sesión
+# Escribir sesion (defensa en profundidad: realpath + prefix check)
 session_file = os.path.join(sessions_dir, f"{session_id}.json")
 try:
-    with open(session_file, "w", encoding="utf-8") as f:
+    sessions_dir_real = os.path.realpath(sessions_dir)
+    session_file_real = os.path.realpath(session_file)
+    if not session_file_real.startswith(sessions_dir_real + os.sep):
+        log(f"Path escape detectado: {session_file_real} fuera de {sessions_dir_real}")
+        sys.exit(0)
+    with open(session_file_real, "w", encoding="utf-8") as f:
         json.dump(record, f, indent=2)
 except IOError as e:
     log(f"Error escribiendo session file: {e}")

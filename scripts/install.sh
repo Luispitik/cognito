@@ -53,7 +53,23 @@ EOF
 done
 
 if [ -z "$PROFILE" ]; then
-    echo "❌ Falta --profile. Usa --help para ver opciones."
+    echo "Falta --profile. Usa --help para ver opciones." >&2
+    exit 1
+fi
+
+# --- Whitelist de perfiles (defensa contra argumentos hostiles) ---
+case "$PROFILE" in
+    operator|alumno|public|client) ;;
+    *)
+        echo "Perfil invalido: '$PROFILE'. Permitidos: operator, alumno, public, client." >&2
+        exit 1
+        ;;
+esac
+
+# --- Validar python3 disponible (hard requirement) ---
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "python3 no encontrado en PATH. Cognito requiere Python 3.10+." >&2
+    echo "Windows: instala desde python.org y marca 'Add to PATH'." >&2
     exit 1
 fi
 
@@ -63,9 +79,9 @@ REPO_DIR="$(dirname "$SCRIPT_DIR")"
 PROFILE_FILE="$REPO_DIR/profiles/${PROFILE}.yaml"
 
 if [ ! -f "$PROFILE_FILE" ]; then
-    echo "❌ Perfil '$PROFILE' no encontrado en profiles/"
-    echo "Disponibles:"
-    ls "$REPO_DIR/profiles/" | sed 's/\.yaml//' | sed 's/^/  /'
+    echo "Perfil '$PROFILE' no encontrado en profiles/" >&2
+    echo "Disponibles:" >&2
+    ( cd "$REPO_DIR/profiles/" && ls *.yaml 2>/dev/null | sed 's/\.yaml//' | sed 's/^/  /' ) >&2
     exit 1
 fi
 
@@ -120,18 +136,30 @@ for cmd in "$REPO_DIR/commands/"*.md; do
 done
 
 # --- Aplicar configuración de perfil ---
-echo "→ Aplicando configuración de perfil '$PROFILE'..."
+echo "-> Aplicando configuracion de perfil '$PROFILE'..."
 # Actualizar _operator-config.json → profile
-python3 <<PYEOF
-import json
-config_path = "$TARGET_DIR/config/_operator-config.json"
-with open(config_path) as f:
-    config = json.load(f)
-config["profile"] = "$PROFILE"
-with open(config_path, "w") as f:
+# Valores pasados por env (NO interpolacion bash) para cerrar vector de inyeccion.
+export COGNITO_CONFIG_PATH="$TARGET_DIR/config/_operator-config.json"
+export COGNITO_PROFILE="$PROFILE"
+python3 <<'PYEOF'
+import json, os, sys
+config_path = os.environ["COGNITO_CONFIG_PATH"]
+profile = os.environ["COGNITO_PROFILE"]
+try:
+    with open(config_path, encoding="utf-8") as f:
+        config = json.load(f)
+except Exception as e:
+    print(f"  Error leyendo config: {e}", file=sys.stderr)
+    sys.exit(1)
+if not isinstance(config, dict):
+    print("  _operator-config.json debe ser un objeto JSON.", file=sys.stderr)
+    sys.exit(1)
+config["profile"] = profile
+with open(config_path, "w", encoding="utf-8") as f:
     json.dump(config, f, indent=2)
-print(f"  ✓ Perfil aplicado: $PROFILE")
+print(f"  Perfil aplicado: {profile}")
 PYEOF
+unset COGNITO_CONFIG_PATH COGNITO_PROFILE
 
 # --- Reporte final ---
 echo ""

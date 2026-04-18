@@ -24,6 +24,16 @@ const PALETTE = {
 
 const charts = {};
 
+// HTML-escape helper. All dynamic values interpolated into innerHTML
+// templates MUST go through this to avoid DOM-based XSS from a poisoned
+// data.json (e.g. a crafted sessionId containing <script>).
+function esc(value) {
+  if (value === null || value === undefined) return '';
+  const div = document.createElement('div');
+  div.textContent = String(value);
+  return div.innerHTML;
+}
+
 async function loadData() {
   try {
     const res = await fetch(`data.json?t=${Date.now()}`);
@@ -44,7 +54,7 @@ function renderError(err) {
       <p class="text-muted text-sm mb-4">No se encuentra <code class="bg-slate-100 px-1 rounded">dashboard/data.json</code>.</p>
       <p class="text-sm text-muted">Ejecuta primero:</p>
       <pre class="mt-3 bg-slate-50 border border-slate-200 rounded p-3 text-xs inline-block text-left">python3 dashboard/api/build_data.py</pre>
-      <p class="text-xs text-muted mt-6">Error: ${err.message}</p>
+      <p class="text-xs text-muted mt-6">Error: ${esc(err.message)}</p>
     </div>
   `;
 }
@@ -71,17 +81,19 @@ function relTime(iso) {
 }
 
 function renderHeader(data) {
-  document.getElementById('data-source').textContent = data.cognitioDir;
+  document.getElementById('data-source').textContent = data.cognitioDir || '';
   document.getElementById('generated-at').textContent = `Generado ${relTime(data.generatedAt)}`;
 
-  const phase = data.status.currentPhase;
+  const phase = (data.status && data.status.currentPhase) || 'unknown';
+  const phaseColor = PALETTE.phases[phase] || PALETTE.muted;
   document.getElementById('status-phase').innerHTML = `
-    <span class="w-2 h-2 rounded-full" style="background:${PALETTE.phases[phase] || PALETTE.muted}"></span>
-    <span class="phase-pill" data-phase="${phase}">${phase}</span>
+    <span class="w-2 h-2 rounded-full" style="background:${esc(phaseColor)}"></span>
+    <span class="phase-pill" data-phase="${esc(phase)}">${esc(phase)}</span>
   `;
 
+  const profile = (data.status && data.status.profile) || '-';
   document.getElementById('status-profile').innerHTML = `
-    perfil: <strong>${data.status.profile}</strong>
+    perfil: <strong>${esc(profile)}</strong>
   `;
 }
 
@@ -214,17 +226,20 @@ function renderGates(data) {
     return;
   }
   const max = Math.max(...gates.map(g => g.count));
-  container.innerHTML = gates.map(g => `
+  container.innerHTML = gates.map(g => {
+    const pct = Number.isFinite(max) && max > 0 ? (g.count / max) * 100 : 0;
+    return `
     <div class="gate-row">
       <div class="flex-1 min-w-0">
-        <code class="block truncate">${g.gate}</code>
+        <code class="block truncate">${esc(g.gate)}</code>
         <div class="mt-1 h-1 bg-slate-100 rounded overflow-hidden">
-          <div style="width:${(g.count / max) * 100}%" class="h-full bg-err/60"></div>
+          <div style="width:${pct.toFixed(2)}%" class="h-full bg-err/60"></div>
         </div>
       </div>
       <span class="count ml-3">${fmt(g.count)}</span>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function renderSinapsis(data) {
@@ -233,7 +248,8 @@ function renderSinapsis(data) {
   const s = data.status.sinapsisBridge || {};
 
   if (s.available) {
-    badge.innerHTML = `<span class="chip ok">● Activo ${s.version ? 'v' + s.version : ''}</span>`;
+    const versionLabel = s.version ? 'v' + esc(s.version) : '';
+    badge.innerHTML = `<span class="chip ok">Activo ${versionLabel}</span>`;
     details.innerHTML = `
       <p>Bridge conectado. Modos Ejecutor, Verificador y Auditor pueden leer instincts aprendidos.</p>
       <div class="mt-3 grid grid-cols-3 gap-4 text-center">
@@ -242,20 +258,20 @@ function renderSinapsis(data) {
           <div class="text-xs text-muted">instincts activos</div>
         </div>
         <div>
-          <div class="text-2xl font-semibold text-ink">${s.version || '?'}</div>
-          <div class="text-xs text-muted">versión</div>
+          <div class="text-2xl font-semibold text-ink">${esc(s.version || '?')}</div>
+          <div class="text-xs text-muted">version</div>
         </div>
         <div>
-          <div class="text-2xl font-semibold text-ok">✓</div>
+          <div class="text-2xl font-semibold text-ok">OK</div>
           <div class="text-xs text-muted">auto-detectado</div>
         </div>
       </div>
     `;
   } else {
-    badge.innerHTML = `<span class="chip">○ Standalone</span>`;
+    badge.innerHTML = `<span class="chip">Standalone</span>`;
     details.innerHTML = `
-      <p>Cognitio funciona en modo standalone. Sinapsis no está instalado o está deshabilitado.</p>
-      <p class="mt-2 text-xs">Para conectar: instala Sinapsis o edita <code class="bg-slate-100 px-1 rounded">config/_operator-config.json → integrations.sinapsis</code>.</p>
+      <p>Cognitio funciona en modo standalone. Sinapsis no esta instalado o esta deshabilitado.</p>
+      <p class="mt-2 text-xs">Para conectar: instala Sinapsis o edita <code class="bg-slate-100 px-1 rounded">config/_operator-config.json -> integrations.sinapsis</code>.</p>
     `;
   }
 }
@@ -269,11 +285,12 @@ function renderSessions(data) {
   }
   tbody.innerHTML = sessions.map(s => {
     const m = s.metrics || {};
+    const phase = s.phaseAtClose || 'unknown';
     return `
       <tr class="hover:bg-slate-50">
-        <td class="py-2 pr-3"><code class="text-xs">${s.sessionId}</code></td>
-        <td class="py-2 pr-3 text-xs text-muted">${relTime(s.closedAt)}</td>
-        <td class="py-2 pr-3"><span class="phase-pill" data-phase="${s.phaseAtClose}">${s.phaseAtClose}</span></td>
+        <td class="py-2 pr-3"><code class="text-xs">${esc(s.sessionId)}</code></td>
+        <td class="py-2 pr-3 text-xs text-muted">${esc(relTime(s.closedAt))}</td>
+        <td class="py-2 pr-3"><span class="phase-pill" data-phase="${esc(phase)}">${esc(phase)}</span></td>
         <td class="py-2 text-right font-mono text-xs">${fmt(m.gatesTriggered || 0)}</td>
         <td class="py-2 text-right font-mono text-xs">${fmt(m.modeInjections || 0)}</td>
         <td class="py-2 text-right font-mono text-xs">${fmt(m.phaseDetections || 0)}</td>

@@ -39,12 +39,15 @@ Usa la estructura completa de `templates/matriz-decision.md`. Header:
 6. **Empates explícitos**: si <5% diferencia, dilo. No fuerces desempate.
 
 ## Cuándo NO ejecutar
+
 - <2 alternativas disponibles.
 - Fase actual = Execution/Shipping (consolidación ya ocurrió en Planning).
 - Decisión trivial sin trade-offs.
 
 ## Interacción con Devil's Advocate
+
 Si el usuario ejecuta `/devils-advocate` después de ti, incorpora sus críticas en la matriz. No es fallo del consolidador; es iteración sana.
 
 ## Nota
+
 Override. Al terminar, `/modo off consolidador`.

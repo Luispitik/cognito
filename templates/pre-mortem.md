@@ -7,6 +7,7 @@ Principio: *imagina que han pasado 6-12 meses y el plan ha fracasado. Escribe el
 ---
 
 ## Contexto
+
 - **Decisión / plan**: [nombre corto]
 - **Horizonte del pre-mortem**: [3 / 6 / 12 / 24 meses]
 - **Fase actual**: [Planning / Review]
@@ -18,18 +19,21 @@ Principio: *imagina que han pasado 6-12 meses y el plan ha fracasado. Escribe el
 ## 3-5 causas raíz del fracaso (hipotéticas pero realistas)
 
 ### Causa raíz 1: [Nombre corto]
+
 - **Qué ocurrió**: [descripción concreta]
 - **Síntomas tempranos** (qué habríamos podido detectar antes): [...]
 - **Momento de no-retorno**: [cuándo pasó de reversible a irreversible]
 - **Probabilidad estimada**: Alta / Media / Baja
 
 ### Causa raíz 2: [Nombre corto]
+
 - **Qué ocurrió**: [...]
 - **Síntomas tempranos**: [...]
 - **Momento de no-retorno**: [...]
 - **Probabilidad estimada**: [...]
 
 ### Causa raíz 3: [Nombre corto]
+
 ...
 
 (Máximo 5. Si llegas a más, jerarquiza y agrupa.)
@@ -65,7 +69,9 @@ Principio: *imagina que han pasado 6-12 meses y el plan ha fracasado. Escribe el
 - [ ] **Replantear** — volver a fase [Discovery/Planning] porque [...].
 
 ### Si procedemos
+
 **Monitorizar estas señales de alarma tempranas**:
+
 1. [señal concreta con umbral]
 2. [...]
 3. [...]

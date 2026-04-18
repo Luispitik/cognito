@@ -11,6 +11,7 @@ Atajo rápido al modo Divergente del sistema Cognito. Asume que el problema ya e
 Sin preguntar, ejecuta este workflow sobre el problema/decisión en curso.
 
 ### 1. Activar modo divergente (en segundo plano)
+
 - Añade `divergente` a `overrideModes` en `_phase-state.json` (si no está).
 
 ### 2. Re-encuadre breve (máx. 3 líneas)

@@ -50,7 +50,9 @@ bash tests/run_tests.sh
 ## Convenciones
 
 ### Commits
+
 Prefijos:
+
 - `feat:` nueva funcionalidad
 - `fix:` bug fix
 - `docs:` solo documentación
@@ -59,6 +61,7 @@ Prefijos:
 - `chore:` infraestructura, CI, deps
 
 ### Código
+
 - **Bash hooks**: `set -euo pipefail`, shebang `#!/usr/bin/env bash`, Python helpers inline cuando jq no basta.
 - **Python tests**: pytest, nombres `test_<qué>`, fixtures en `conftest.py`.
 - **SKILL.md**: frontmatter válido, nombres con prefijo `cognito-`, triggers claros.
@@ -69,6 +72,7 @@ Prefijos:
 
 1. Crear `modes/<nombre>/SKILL.md` con frontmatter completo.
 2. Registrar en `config/_modes.json`:
+
    ```json
    "nombre": {
      "displayName": "...",
@@ -79,6 +83,7 @@ Prefijos:
      "defaultPhases": [...]
    }
    ```
+
 3. Si toca defaults de alguna fase, añadir a `config/_phases.json → phases.<fase>.defaultModes`.
 4. Crear command atajo en `commands/<nombre>.md`.
 5. Si necesita plantilla, crearla en `templates/<nombre>.md`.
@@ -103,6 +108,7 @@ Prefijos:
 ## Code review
 
 Tu PR pasará por review. Busca feedback sobre:
+
 - Consistencia con filosofía de Cognito.
 - Claridad del SKILL.md (¿un tercero lo entiende?).
 - Cobertura de tests.

@@ -42,10 +42,10 @@
       },
       {
         "id": "no-hardcode-pii",
-        "pattern": "(email|telefono|phone|dni|nif|cif)[\\s]*=[\\s]*['\"][^'\"]+['\"]",
+        "pattern": "(email\\s*=\\s*['\"][^'\"]+@[^'\"]+\\.[a-z]{2,}['\"]|(telefono|phone)\\s*=\\s*['\"][0-9+\\s()-]{9,}['\"]|(dni|nif|cif)\\s*=\\s*['\"][0-9]{8}[A-Z]['\"])",
         "filesAffected": ["*.ts", "*.tsx", "*.js", "*.py"],
         "action": "block",
-        "message": "Parece que hay PII hardcodeada. Usa variables de entorno o parámetros. Si es un test, añade comentario // test-fixture.",
+        "message": "Parece que hay PII hardcodeada (email válido, teléfono de 9+ dígitos, o DNI/NIF/CIF con formato español). Usa variables de entorno o parámetros. Si es un test, añade comentario // test-fixture. Override: /cognition-gate override no-hardcode-pii",
         "override": "/cognition-gate override no-hardcode-pii"
       },
       {

@@ -66,6 +66,19 @@ case "$PROFILE" in
         ;;
 esac
 
+# --- client profile requires --client-intake -------------------------------
+# Backported from the v1.0 fix (044d4c4): advertised support must actually work.
+if [ "$PROFILE" = "client" ]; then
+    if [ -z "$CLIENT_INTAKE" ]; then
+        echo "Profile 'client' requires --client-intake=PATH." >&2
+        exit 1
+    fi
+    if [ ! -f "$CLIENT_INTAKE" ]; then
+        echo "Intake file not found: $CLIENT_INTAKE" >&2
+        exit 1
+    fi
+fi
+
 # --- Tooling prereqs -------------------------------------------------------
 if ! command -v python3 >/dev/null 2>&1; then
     echo "python3 not found in PATH (Cognito requires Python 3.10+)." >&2
@@ -168,6 +181,12 @@ fi
 
 mkdir -p "$TARGET_DIR"/{config,hooks,logs,sessions,integrations}
 mkdir -p "$TARGET_DIR/logs/archive"
+
+# --- Copy client intake (after target dir exists) --------------------------
+if [ "$PROFILE" = "client" ] && [ -n "$CLIENT_INTAKE" ]; then
+    cp "$CLIENT_INTAKE" "$TARGET_DIR/config/intake.json"
+    echo "-> Intake copied to $TARGET_DIR/config/intake.json"
+fi
 
 # --- Copy hooks listed in the profile -------------------------------------
 echo "-> Installing hooks..."

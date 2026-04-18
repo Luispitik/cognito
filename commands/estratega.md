@@ -61,9 +61,11 @@ Atajo al modo Estratega de Cognito.
 5. **No convertir todo en estrategia**: preguntas tácticas triviales no necesitan análisis de 10 años.
 
 ## Cuándo NO ejecutar
+
 - Decisión trivial (nombre de variable, elección tool menor).
 - Fase Execution (es tarde para zoom-out).
 - Usuario pide velocidad.
 
 ## Nota
+
 Override. Al terminar, `/modo off estratega`.

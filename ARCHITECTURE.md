@@ -7,18 +7,23 @@ Este documento explica **por qué** Cognito está estructurado así y qué trade
 ## 1. Principios de diseño
 
 ### 1.1 Modularidad sobre monolitismo
+
 Cada modo es una skill independiente. Se pueden activar, desactivar, reemplazar o customizar sin tocar el resto.
 
 ### 1.2 Determinismo donde importa
+
 Los hooks bash/python son deterministas (mismo input = mismo output). Se usan para **gates críticos** (bloquear anti-patrones, validar outputs) pero no para tareas creativas.
 
 ### 1.3 Estado persistente mínimo
+
 Solo 1 archivo guarda el estado mutable (`_phase-state.json`). Los demás JSONs son configuración.
 
 ### 1.4 Audiencias como perfiles, no como forks
+
 El código es uno. La adaptación a alumnos / público / cliente se hace vía YAML profiles que controlan qué se instala y cómo se formula.
 
 ### 1.5 Sin romper nada existente
+
 Cognito convive con Sinapsis, skill-router, skills personales. No pisa hooks, no reescribe configuración global.
 
 ---
@@ -71,6 +76,7 @@ Escogimos fases **genéricas** sobre fases específicas de un caso de uso (Lead/
 3. **Mapping fácil**: los perfiles mapean fases genéricas a workflows específicos (ver `profiles/*.yaml`).
 
 ### Transiciones válidas
+
 ```
 Discovery ─┬→ Planning ──→ Execution ──→ Review ──→ Shipping
            │                    ↑              │
@@ -86,6 +92,7 @@ Cognito permite cualquier transición. No es un workflow rígido.
 ## 5. Activación híbrida: por qué
 
 ### Alternativas evaluadas
+
 | Opción | Pros | Contras |
 |--------|------|---------|
 | Solo slash commands | Control total | Fricción, olvido |
@@ -94,6 +101,7 @@ Cognito permite cualquier transición. No es un workflow rígido.
 | **Híbrido (elegido)** | Flexible + controlado | Más piezas |
 
 ### Decisión final
+
 - **Estado persistente** en `_phase-state.json` → la fase del proyecto (persiste entre sesiones).
 - **Slash commands** (`/fase`, `/modo`) → cambios explícitos con feedback visible.
 - **Hook sugerente** (no auto-aplicar) → detecta señales, sugiere cambio, tú confirmas con un sí/no.
@@ -105,16 +113,19 @@ La clave es: **la auto-detección sugiere, nunca decide**. El usuario mantiene a
 ## 6. Determinismo selectivo
 
 ### Cuándo usar hook determinista
+
 - **Gate crítico**: donde un error es caro (deploy, PII, compliance).
 - **Convención no-negociable**: "nunca n8n", "RLS obligatorio".
 - **Detección de señales**: entrada estructurada que requiere clasificación.
 - **Log de estado**: registro inmutable de decisiones tomadas.
 
 ### Cuándo usar plantilla fija
+
 - **Output estructurado** que debe mantener formato: matriz decisión, pre-mortem, checklist.
 - Claude rellena valores, no altera estructura.
 
 ### Cuándo dejar libre
+
 - **Ideación**, divergencia.
 - **Análisis profundo** donde variedad añade valor.
 - **Síntesis creativa** que no se beneficia de plantilla.
@@ -133,6 +144,7 @@ La clave es: **la auto-detección sugiere, nunca decide**. El usuario mantiene a
 ## 7. Cómo se integra con Sinapsis y el resto del ecosistema
 
 ### Separación de responsabilidades
+
 | Sistema | Responsabilidad |
 |---------|-----------------|
 | **Sinapsis** | Aprendizaje continuo: observar, aprender reglas, inyectar como instincts |
@@ -141,6 +153,7 @@ La clave es: **la auto-detección sugiere, nunca decide**. El usuario mantiene a
 | **Skills personales** del operador | Ejecución de tareas específicas del dominio |
 
 ### Interacción
+
 1. Sinapsis aprende que "cuando el operador edita `.env` debe recordarse que no se commitea" → genera instinct.
 2. Cognito, en fase Execution con modo Ejecutor, ve ese instinct y lo incorpora al checklist.
 3. Gate-validator de Cognito bloquea `git add .env` con el razonamiento del instinct.
@@ -148,6 +161,7 @@ La clave es: **la auto-detección sugiere, nunca decide**. El usuario mantiene a
 Cognito **consume** pero no modifica el sistema Sinapsis.
 
 ### No conflict
+
 - Cognito usa su propio namespace `_cognito-*` en los archivos.
 - Sus hooks viven en `cognito/hooks/`, no en `~/.claude/hooks/` (global).
 - Se registran en settings.json con nombre explícito `cognito-*`.
@@ -228,6 +242,7 @@ installs:
 ## 9. Versionado
 
 Semver por componente:
+
 - Sistema global: `MAJOR.MINOR.PATCH` en `CHANGELOG.md`.
 - Cada modo: versión propia en `modes/<name>/SKILL.md` frontmatter.
 - Cada hook: versión propia en cabecera del script.
@@ -241,18 +256,23 @@ Semver por componente:
 ## 10. Decisiones rechazadas (por si alguien las reabre)
 
 ### ❌ Agente único que cambia de rol
+
 Rechazado porque: pérdida de determinismo, rol ambiguo, difícil debuggear qué modo estaba activo cuando algo falló.
 
 ### ❌ Fases específicas del operador como default
+
 Rechazado porque: baja portabilidad. Las fases específicas quedan en `profiles/operator.yaml → mapping`.
 
 ### ❌ Auto-cambio de fase por detección
+
 Rechazado porque: LLM pierde agencia del usuario. La detección sugiere, no aplica.
 
 ### ❌ Hook MCP en lugar de bash
+
 Rechazado porque: dependencia externa (servidor MCP) añade fragilidad. Bash/Python son locales.
 
 ### ❌ Un único SKILL.md gigante
+
 Rechazado porque: imposible de customizar por audiencia. Modularidad en `modes/` es clave.
 
 ---
@@ -260,19 +280,23 @@ Rechazado porque: imposible de customizar por audiencia. Modularidad en `modes/`
 ## 11. Roadmap
 
 ### v1.0 (actual)
+
 - 7 modos + 5 fases + 4 hooks + 4 perfiles.
 - Instalación manual.
 - Dashboard `/cognition-status`.
 
 ### v1.1
+
 - Installer CLI `./scripts/install.sh --profile=X`.
 - Tests automatizados por hook.
 
 ### v1.2
+
 - Integración con Sinapsis (modo Ejecutor consume instincts activos).
 - Métricas: qué modos/fases se usan más.
 
 ### v2.0
+
 - Modos custom por usuario (`modes/custom/` + registro en `_modes.json`).
 - Marketplace público en GitHub (como Skills Marketplace en roadmap de Luis).
 
@@ -281,15 +305,19 @@ Rechazado porque: imposible de customizar por audiencia. Modularidad en `modes/`
 ## 12. Anti-patrones conocidos
 
 ### Activar todos los modos siempre
+
 Consume contexto, ralentiza. Usar fases como filtro natural.
 
 ### Gates demasiado agresivos
+
 Bloquear edición de `package.json` por "seguridad" es contraproducente. Gates = anti-patrones, no preferencias.
 
 ### Copiar-pegar entre perfiles
+
 Si una regla aparece en 3+ perfiles, subirla al core. Si solo en 1, dejarla en el perfil.
 
 ### Modos sin disparador claro
+
 Cada modo debe tener trigger detectable (verbalización + contexto). Si no, se convierte en ruido.
 
 ---

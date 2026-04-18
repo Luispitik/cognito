@@ -12,6 +12,7 @@ labels: ["enhancement", "needs-triage"]
 <!-- New mode? New phase? Extension of an existing one? -->
 
 ## Category
+
 - [ ] New mode
 - [ ] New phase
 - [ ] New hook / gate
@@ -23,8 +24,8 @@ labels: ["enhancement", "needs-triage"]
 
 ## Acceptance criteria
 <!-- How will we know this is done? -->
-- [ ] 
-- [ ] 
+- [ ]
+- [ ]
 - [ ] Tests added
 - [ ] Documentation updated
 

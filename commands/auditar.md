@@ -33,6 +33,7 @@ Usa la estructura completa de `templates/auditoria-output.md`. Header:
 ## Tipos de auditoría
 
 Detecta el tipo del contexto:
+
 - **Pre-shipping**: foco en "ready to ship?"
 - **Post-shipping**: foco en lessons + patrones
 - **Sprint retro**: foco en acciones siguiente sprint
@@ -49,6 +50,7 @@ Detecta el tipo del contexto:
 ## Integración con Sinapsis
 
 Si Sinapsis está instalado, al final propón lessons candidatos a instincts:
+
 ```
 **Lessons candidatos para Sinapsis**:
 - L1: "[regla]" — scope: [global/project] — `/instinct-add` para promover
@@ -57,8 +59,10 @@ Si Sinapsis está instalado, al final propón lessons candidatos a instincts:
 No añadas instincts sin confirmación del usuario.
 
 ## Cuándo NO ejecutar
+
 - Proyecto en curso sin entregable finalizado (audita algo concreto).
 - Sin datos suficientes para evidencia.
 
 ## Nota
+
 Override. Al terminar, `/modo off auditor`.

@@ -24,15 +24,18 @@ Usa esta plantilla en modo **Auditor** (fase Review).
 *Máximo 3 puntos priorizados.*
 
 ### 1.1 [Práctica]
+
 - **Descripción concreta**: [...]
 - **Evidencia**: [archivo, commit, documento, cifra]
 - **Por qué funcionó**: [análisis breve]
 - **Recomendación**: replicar en [contextos similares]
 
 ### 1.2 [Práctica]
+
 ...
 
 ### 1.3 [Práctica]
+
 ...
 
 ---
@@ -42,6 +45,7 @@ Usa esta plantilla en modo **Auditor** (fase Review).
 *Máximo 3 puntos priorizados.*
 
 ### 2.1 [Problema]
+
 - **Descripción concreta**: [...]
 - **Causa raíz probable**: [análisis, no especulación]
 - **Impacto observado**: [cifra, tiempo perdido, retrabajo]
@@ -52,9 +56,11 @@ Usa esta plantilla en modo **Auditor** (fase Review).
   - **Cómo verificar**: [criterio de éxito]
 
 ### 2.2 [Problema]
+
 ...
 
 ### 2.3 [Problema]
+
 ...
 
 ---
@@ -62,11 +68,13 @@ Usa esta plantilla en modo **Auditor** (fase Review).
 ## 3. Qué faltó (añadir)
 
 ### 3.1 [Gap]
+
 - **Qué debería haberse hecho y no se hizo**: [...]
 - **Consecuencia**: [...]
 - **Cómo detectar antes la próxima vez**: [mecanismo, gate, checklist]
 
 ### 3.2 [Gap]
+
 ...
 
 ---
@@ -76,6 +84,7 @@ Usa esta plantilla en modo **Auditor** (fase Review).
 *Formular como reglas imperativas, aptas para promocionar a Sinapsis instincts.*
 
 ### L1: [Nombre de la lección]
+
 - **Regla**: "Cuando [contexto], [hacer/evitar] [acción], porque [razón]"
 - **Contexto de aplicación**: [cuándo aplica]
 - **Cómo detectar**: [trigger observable]
@@ -83,6 +92,7 @@ Usa esta plantilla en modo **Auditor** (fase Review).
 - **Scope**: global / project / personal
 
 ### L2: [Nombre de la lección]
+
 ...
 
 ---
@@ -123,13 +133,16 @@ Usa esta plantilla en modo **Auditor** (fase Review).
 - [ ] **REPLANTEAR** — volver a fase [Discovery/Planning] porque [razón específica].
 
 ### Justificación del veredicto
+
 [2-3 líneas]
 
 ### Si LISTO, siguientes pasos
+
 1. [...]
 2. [...]
 
 ### Si AJUSTAR, re-auditar cuando
+
 - [ ] Las acciones correctivas estén completadas.
 - [ ] [Evidencia concreta de que se resolvieron los problemas]
 
@@ -138,10 +151,12 @@ Usa esta plantilla en modo **Auditor** (fase Review).
 ## 8. Integración con Sinapsis (si está instalado)
 
 **Instincts candidatos para promover**:
+
 - [ ] L1 — `/instinct-add` (requiere confirmación del operador)
 - [ ] L2 — `/instinct-add` (requiere confirmación del operador)
 
 **Instincts existentes validados/refutados por esta auditoría**:
+
 - ✓ [Instinct ID]: confirmado de nuevo.
 - ✗ [Instinct ID]: refutado por [evidencia] — candidato a revisar.
 

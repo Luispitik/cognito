@@ -47,8 +47,10 @@ Atajo al modo Verificador de Cognito.
 4. **No contradigas al usuario sin verificar**. Si tienes base contra su claim, contrasta explícitamente citando fuente.
 
 ## Cuándo NO ejecutar
+
 - Conversación sin claims factuales (puras ideas).
 - Usuario pide velocidad explícita.
 
 ## Nota
+
 Este comando es override. La fase del proyecto no cambia. Al terminar, usa `/modo off verificador` si quieres dejar el modo fuera.

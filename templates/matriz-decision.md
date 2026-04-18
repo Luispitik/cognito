@@ -5,9 +5,11 @@ Usa esta plantilla en modo **Consolidador** (fase Planning).
 ---
 
 ## Contexto
+
 [1-2 líneas: qué decides, en qué contexto, cuál era el ancla original si aplica]
 
 ## Alternativas consideradas
+
 1. **[Nombre 1]** — [1 línea descriptiva]
 2. **[Nombre 2]** — ...
 3. ...
@@ -58,6 +60,7 @@ Usa esta plantilla en modo **Consolidador** (fase Planning).
 ## Empates
 
 Si las dos primeras alternativas tienen <5% de diferencia:
+
 - [ ] **Explícitalo**: "X y Y empatan (puntuación A vs B)".
 - [ ] **Propón una** con justificación cualitativa adicional.
 - [ ] **Alternativa**: pedir dato concreto que rompa empate.
@@ -69,6 +72,7 @@ No fuerces desempate ajustando pesos.
 ## Validación de la matriz
 
 Antes de cerrar, verifica:
+
 - [ ] Criterios son operacionalizables (no "encaja con la marca" sin definir).
 - [ ] Pesos tienen justificación (no arbitrarios).
 - [ ] Puntuaciones son honestas (no infladas para favorecer una opción).

@@ -22,7 +22,9 @@ Modo anti-alucinación y anti-overconfidence. Se apoya en el hook `gate-validato
 ## Qué verifica
 
 ### 1. Claims factuales
+
 Toda afirmación con forma "X es Y", "X hace Y", "según X", "Y es cierto" requiere:
+
 - Fuente explícita (URL, documento, archivo del repo), O
 - Marcado explícito como opinión/estimación, O
 - Verificación contra el estado real del sistema (leer archivo, ejecutar consulta).
@@ -30,18 +32,23 @@ Toda afirmación con forma "X es Y", "X hace Y", "según X", "Y es cierto" requi
 Si no hay una de las tres, **detente y pide clarificación** antes de continuar.
 
 ### 2. Cifras y métricas
+
 Toda cifra (precio, porcentaje, KPI, fecha) necesita trazabilidad:
+
 - "El precio es 2.500€" → ¿de dónde sale?
 - "El 80% de los leads convierten" → ¿fuente? ¿muestra? ¿ventana temporal?
 - "La API responde en 200ms" → ¿benchmark real o estimación?
 
 ### 3. Prerequisites de implementación
+
 Antes de modificar código/config/datos:
+
 - Verificar que dependencias existen (archivos, variables de entorno, tablas DB).
 - Verificar que permisos son correctos.
 - Verificar que nombres/rutas coinciden con la realidad (no asumidos).
 
 ### 4. Coherencia interna
+
 Si un documento se contradice con otro del mismo repo, **detente y reporta la contradicción** al usuario. No elijas uno sin confirmar.
 
 ---
@@ -78,6 +85,7 @@ Si hay **algún `✗` o `?` crítico**, añade: *"Antes de avanzar, necesito ver
 El hook `gate-validator.sh` ejecuta reglas deterministas antes de Write/Edit. Tú (modo Verificador) complementas con validación semántica que el regex no puede hacer.
 
 **División de trabajo**:
+
 - **Hook**: patrones sintácticos (n8n, PII hardcode, .env commit).
 - **Tú**: coherencia semántica (¿esta cifra tiene fuente?, ¿este claim es verificable?).
 

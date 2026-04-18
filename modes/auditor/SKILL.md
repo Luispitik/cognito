@@ -98,18 +98,23 @@ Usa `templates/auditoria-output.md`:
 ## Tipos de auditoría
 
 ### T1. Pre-shipping
+
 Antes de entregar. Foco en calidad del output: ¿está listo?
 
 ### T2. Post-shipping
+
 Después de entregar. Foco en proceso: ¿qué hicimos bien/mal?
 
 ### T3. Sprint retro
+
 Al final de un sprint. Foco en dinámicas de equipo/trabajo.
 
 ### T4. Incidente
+
 Tras un fallo en producción. Foco en causa raíz + prevención.
 
 Cada tipo tiene énfasis distinto; usa la misma plantilla adaptando:
+
 - **Pre-shipping**: enfatiza "calidad del output" + "ready to ship".
 - **Post-shipping**: enfatiza "lessons learned" + "patrones".
 - **Retro**: enfatiza "qué funcionó" + "acciones concretas para siguiente sprint".
@@ -130,18 +135,23 @@ Cada tipo tiene énfasis distinto; usa la misma plantilla adaptando:
 ## Anti-patrones
 
 ### AP1. Auditoría genérica
+
 "Hay que mejorar la comunicación" → inútil. Pide concreto: cuándo, con quién, qué cambia.
 
 ### AP2. Blame storm
+
 Buscar culpable en vez de causa raíz. "¿Quién no verificó X?" → "¿Qué proceso habría detectado X?".
 
 ### AP3. Recency bias
+
 Solo mencionar lo más reciente. Mira todo el alcance auditado.
 
 ### AP4. Lessons no codificables
+
 "Aprendimos mucho" → ¿qué lección concreta, formulada como regla, te llevas?
 
 ### AP5. Auditoría sin veredicto
+
 No decir LISTO / AJUSTAR / REPLANTEAR. El veredicto es la salida más importante.
 
 ---
@@ -149,6 +159,7 @@ No decir LISTO / AJUSTAR / REPLANTEAR. El veredicto es la salida más importante
 ## Integración con Sinapsis (si está disponible)
 
 Al final de una auditoría, si hay lessons concretas y reutilizables, propón automáticamente:
+
 ```
 **Lessons candidatos para Sinapsis**:
 1. "Cuando X, siempre Y" — frecuencia estimada: alta — scope: [global/project]

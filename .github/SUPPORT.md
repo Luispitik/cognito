@@ -11,7 +11,7 @@ Before asking, check:
 
 ## Asking questions
 
-- **Discussions** (https://github.com/Luispitik/cognito/discussions) — general questions, ideas, use-case sharing.
+- **Discussions** (<https://github.com/Luispitik/cognito/discussions>) — general questions, ideas, use-case sharing.
 - **Issues** — only for reproducible bugs or specific feature requests (use the templates).
 
 ## Not for support

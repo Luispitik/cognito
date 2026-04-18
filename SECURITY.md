@@ -98,11 +98,13 @@ Cognito is a **local-only** tool that runs inside a user's Claude Code session. 
 ### Attacker model
 
 The attacker can:
+
 - Submit arbitrary text as a Claude prompt (adversarial prompt injection)
 - Place crafted files in the working directory
 - Modify Cognito config files only if they already have filesystem access (already-compromised system)
 
 The attacker cannot, by Cognito's design:
+
 - Reach Cognito over the network (no network surface)
 - Exfiltrate session data to a remote server (no telemetry)
 

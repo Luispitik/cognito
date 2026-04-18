@@ -112,6 +112,7 @@ Usa `templates/pre-mortem.md` como estructura. Formato:
 Siempre usa la plantilla `templates/pre-mortem.md`. No improvises estructura. Rellena todas las secciones — si una no aplica, escribe "N/A: [razón breve]".
 
 Output mínimo válido:
+
 - 3+ causas raíz
 - 1 steel-man
 - 2+ puntos de fragilidad con cifras/plazos

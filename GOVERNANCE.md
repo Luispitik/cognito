@@ -5,32 +5,40 @@ Cognito is an open-source project under an MIT license. This document describes 
 ## Roles
 
 ### Users
+
 Anyone who installs or uses Cognito. No formal role.
 
 ### Contributors
+
 Anyone whose PR has been merged. Credited in commit history and CHANGELOG.
 
 ### Maintainers
+
 Contributors with merge rights. Currently listed in `.github/CODEOWNERS`.
 
 ### Project lead
+
 The person who owns the canonical repository (@Luispitik). Holds final decision on scope, direction, and releases.
 
 ## Decision making
 
 ### Lightweight (most changes)
+
 Small changes — bug fixes, docs, tests, new modes that follow existing patterns — are decided by lazy consensus among maintainers. If no maintainer objects within 5 working days, the PR is approved by default.
 
 ### Substantive (architectural changes)
+
 Changes that affect the public API, break existing configurations, or change governance require explicit approval from the project lead.
 
 Examples:
+
 - Adding or removing modes
 - Changing the hook contract
 - Renaming config files or keys
 - Bumping major version
 
 ### Security
+
 Security issues follow [SECURITY.md](SECURITY.md). Project lead + security reporter coordinate disclosure.
 
 ## Release cadence

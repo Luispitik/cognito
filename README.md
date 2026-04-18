@@ -123,6 +123,7 @@ bash dashboard/serve.sh                # sirve en localhost:8765
 Incluye: KPIs (sesiones, modos, gates, detecciones), charts de uso por modo/fase, timeline de 30 días, top gates disparados, tabla de sesiones recientes, estado del bridge Sinapsis.
 
 Demo con datos ficticios:
+
 ```bash
 python3 dashboard/api/seed_demo.py    # genera 35 sesiones sintéticas
 ```

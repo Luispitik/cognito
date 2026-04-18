@@ -28,18 +28,20 @@ Usa esta plantilla en modo **Ejecutor** (fases Execution y Shipping).
 ## Pasos de ejecución
 
 ### Paso 1: [Nombre del paso]
+
 - [ ] Acción: [descripción]
 - Verificación de éxito: [criterio concreto]
 - Si falla: [acción específica, NO improvisar]
 - Estado: ⏳ pendiente / 🟢 ejecutando / ✓ completado / ✗ fallido
 
 ### Paso 2: [Nombre del paso]
+
 - [ ] Acción: [...]
 - Verificación: [...]
 - Si falla: [...]
 - Estado: ...
 
-### Paso N: ...
+### Paso N:
 
 ## Post-check
 
@@ -58,15 +60,18 @@ Usa esta plantilla en modo **Ejecutor** (fases Execution y Shipping).
 ## Rollback (si procede)
 
 ### Condición de activación
+
 [Evidencia concreta que dispara rollback]
 *Ejemplo: "Error rate > 1% durante 5 minutos consecutivos", no "si algo va mal"*
 
 ### Pasos de rollback
+
 1. [...]
 2. [...]
 3. [...]
 
 ### Post-rollback
+
 - [ ] Root cause analysis iniciado.
 - [ ] Stakeholders notificados.
 - [ ] Volver a fase Review antes de re-intentar.

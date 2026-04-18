@@ -9,7 +9,8 @@ labels: ["bug", "needs-triage"]
 <!-- One sentence: what's broken? -->
 
 ## Environment
-- Cognito version / commit: 
+
+- Cognito version / commit:
 - OS: <!-- ubuntu 24.04 / macOS 15 / Windows 11 + Git Bash -->
 - Python version: <!-- python3 --version -->
 - Bash version: <!-- bash --version -->
@@ -17,9 +18,10 @@ labels: ["bug", "needs-triage"]
 - Sinapsis bridge: <!-- detected yes/no -->
 
 ## Steps to reproduce
-1. 
-2. 
-3. 
+
+1.
+2.
+3.
 
 ## Expected
 <!-- What you thought would happen -->
@@ -32,6 +34,7 @@ paste relevant output / log excerpts here
 ```
 
 ## Scope impact
+
 - [ ] Affects CI (tests fail)
 - [ ] Affects runtime hooks
 - [ ] Affects dashboard
@@ -39,5 +42,6 @@ paste relevant output / log excerpts here
 - [ ] Not sure
 
 ## Security implication
+
 - [ ] I believe this is a security issue (⚠️ **do not file a public bug**; use GitHub Security Advisories instead — see SECURITY.md)
 - [x] No security implication

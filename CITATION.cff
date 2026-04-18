@@ -4,8 +4,8 @@ cff-version: 1.2.0
 title: "Cognito — Cognitive Operating System for Claude Code"
 message: "If you use Cognito in academic work or derived projects, please cite it as below."
 type: software
-version: 1.0.0
-date-released: "2026-04-15"
+version: 1.1.0
+date-released: "2026-04-18"
 license: MIT
 url: "https://github.com/Luispitik/cognito"
 repository-code: "https://github.com/Luispitik/cognito"
@@ -40,7 +40,7 @@ preferred-citation:
       family-names: Salgado
       alias: Luispitik
       website: "https://salgadoia.com"
-  version: 1.0.0
+  version: 1.1.0
   year: 2026
   url: "https://github.com/Luispitik/cognito"
 references:

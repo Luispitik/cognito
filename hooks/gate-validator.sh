@@ -29,7 +29,8 @@ export COGNITO_DIR_RESOLVED
 
 mkdir -p "$COGNITO_DIR_RESOLVED/logs" 2>/dev/null || true
 
-INPUT_JSON=$(cat 2>/dev/null || echo "{}")
+# Stdin size cap (1 MiB) — gate validator must not blow up on huge payloads.
+INPUT_JSON=$(head -c 1048576 2>/dev/null || echo "{}")
 export INPUT_JSON
 
 python3 <<'PYEOF'
@@ -45,14 +46,6 @@ triggers_file = os.path.join(cognito_dir, "config", "_passive-triggers.json")
 operator_file = os.path.join(cognito_dir, "config", "_operator-config.json")
 log_file = os.path.join(cognito_dir, "logs", "gate-validator.log")
 
-def log(msg):
-    try:
-        with open(log_file, "a", encoding="utf-8") as f:
-            ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-            f.write(f"[{ts}] {msg}\n")
-    except Exception:
-        pass
-
 # Parse input
 input_json = os.environ.get("INPUT_JSON", "{}")
 try:
@@ -61,6 +54,23 @@ try:
         data = {}
 except (json.JSONDecodeError, TypeError):
     data = {}
+
+# session_id tagging: every log line carries the session for reliable
+# per-session metrics in session-closer (v1.1.0).
+_SESSION_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
+_raw_sid = data.get("session_id") or data.get("sessionId") or ""
+if isinstance(_raw_sid, str) and _SESSION_ID_RE.match(_raw_sid):
+    SESSION_ID = _raw_sid
+else:
+    SESSION_ID = "unknown"
+
+def log(msg):
+    try:
+        with open(log_file, "a", encoding="utf-8") as f:
+            ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            f.write(f"[{ts}] [{SESSION_ID}] {msg}\n")
+    except Exception:
+        pass
 
 tool_input = data.get("tool_input", data.get("input", {}))
 if not isinstance(tool_input, dict):

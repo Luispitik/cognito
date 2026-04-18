@@ -27,9 +27,10 @@ fi
 
 export COGNITO_DIR_RESOLVED
 
-mkdir -p "$COGNITO_DIR_RESOLVED/logs" "$COGNITO_DIR_RESOLVED/sessions" 2>/dev/null || true
+mkdir -p "$COGNITO_DIR_RESOLVED/logs" "$COGNITO_DIR_RESOLVED/sessions" "$COGNITO_DIR_RESOLVED/logs/archive" 2>/dev/null || true
 
-INPUT_JSON=$(cat 2>/dev/null || echo "{}")
+# Stdin size cap (1 MiB) to prevent memory exhaustion on malformed payloads.
+INPUT_JSON=$(head -c 1048576 2>/dev/null || echo "{}")
 export INPUT_JSON
 
 python3 <<'PYEOF'
@@ -61,8 +62,17 @@ try:
 except (json.JSONDecodeError, TypeError):
     data = {}
 
-session_id = data.get("session_id") or data.get("sessionId")
-if not session_id:
+import re as _re
+_SESSION_ID_RE = _re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
+raw_session_id = data.get("session_id") or data.get("sessionId")
+if isinstance(raw_session_id, str) and _SESSION_ID_RE.match(raw_session_id):
+    session_id = raw_session_id
+    # When the harness provides session_id only at close time (but not to
+    # the other hooks during the session), log lines will carry "unknown".
+    # partition_and_count() treats those as ours too — see below.
+else:
+    if raw_session_id:
+        log(f"session_id invalido (descartado): {raw_session_id!r}")
     now = datetime.now(timezone.utc)
     session_id = f"session-{now.strftime('%Y%m%d-%H%M%S')}"
 
@@ -79,19 +89,57 @@ if os.path.exists(state_file):
     except (json.JSONDecodeError, IOError):
         pass
 
-# Métricas
-def count_log_lines(log_file, substring):
+# Métricas scoped to THIS session_id. v1.1.0 fix: pre-1.1 counted lifetime
+# log lines (never rotated) so every session reported accumulated totals.
+# Now we:
+#   1. Tag every log line with [session_id] (in each hook).
+#   2. Count only lines carrying this session's id, plus any "[unknown]"
+#      lines (hooks fall back to that tag when the harness does not pass
+#      session_id — treating them as ours is safer than leaking stale state
+#      across sessions).
+#   3. After counting, move those lines to logs/archive/{session_id}.log
+#      so the live log file does not grow unbounded.
+SESSION_TAG = f"[{session_id}]"
+UNKNOWN_TAG = "[unknown]"
+
+def _is_mine(line: str) -> bool:
+    return SESSION_TAG in line or UNKNOWN_TAG in line
+
+def partition_and_count(log_file: str, substring: str) -> int:
+    """Return count of matches for this session, rewrite log file to drop
+    those lines, and append them to the per-session archive."""
     if not os.path.exists(log_file):
         return 0
     try:
         with open(log_file, encoding="utf-8") as f:
-            return sum(1 for line in f if substring in line)
+            lines = f.readlines()
     except IOError:
         return 0
 
-gates_triggered = count_log_lines(os.path.join(logs_dir, "gate-validator.log"), "Violaciones para")
-mode_injections = count_log_lines(os.path.join(logs_dir, "mode-injector.log"), "Modos activos")
-phase_detections = count_log_lines(os.path.join(logs_dir, "phase-detector.log"), "Detectado:")
+    mine_all = [ln for ln in lines if _is_mine(ln)]
+    others = [ln for ln in lines if not _is_mine(ln)]
+    count = sum(1 for ln in mine_all if substring in ln)
+
+    archive_file = os.path.join(logs_dir, "archive", f"{session_id}.log")
+    try:
+        if mine_all:
+            with open(archive_file, "a", encoding="utf-8") as f:
+                f.write(f"# --- from {os.path.basename(log_file)} ---\n")
+                f.writelines(mine_all)
+        # Rewrite live log with only other-session lines. Keeps parallel
+        # sessions intact; atomically replaces via temp file.
+        tmp = log_file + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.writelines(others)
+        os.replace(tmp, log_file)
+    except IOError as e:
+        log(f"No se pudo rotar {log_file}: {e}")
+
+    return count
+
+gates_triggered = partition_and_count(os.path.join(logs_dir, "gate-validator.log"), "Violaciones para")
+mode_injections = partition_and_count(os.path.join(logs_dir, "mode-injector.log"), "Modos activos")
+phase_detections = partition_and_count(os.path.join(logs_dir, "phase-detector.log"), "Detectado:")
 
 record = {
     "sessionId": session_id,
@@ -104,10 +152,15 @@ record = {
     },
 }
 
-# Escribir sesión
+# Escribir sesion (defensa en profundidad: realpath + prefix check)
 session_file = os.path.join(sessions_dir, f"{session_id}.json")
 try:
-    with open(session_file, "w", encoding="utf-8") as f:
+    sessions_dir_real = os.path.realpath(sessions_dir)
+    session_file_real = os.path.realpath(session_file)
+    if not session_file_real.startswith(sessions_dir_real + os.sep):
+        log(f"Path escape detectado: {session_file_real} fuera de {sessions_dir_real}")
+        sys.exit(0)
+    with open(session_file_real, "w", encoding="utf-8") as f:
         json.dump(record, f, indent=2)
 except IOError as e:
     log(f"Error escribiendo session file: {e}")

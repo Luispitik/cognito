@@ -4,8 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cognito · Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!--
+    Supply-chain notes (v1.1.0):
+    - Chart.js is pinned to version 4.4.0 and loaded cross-origin.
+    - Tailwind Play CDN generates script dynamically and cannot be pinned with SRI.
+    - If CDN compromise is in your threat model, vendor both libraries locally.
+      See SECURITY.md -> Supply chain for the full policy.
+
+    To enable SRI for Chart.js, generate the hash and add integrity="sha384-..." :
+      curl -sSL https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js \
+        | openssl dgst -sha384 -binary | openssl base64 -A
+    Cognito does not ship a pre-computed hash because it cannot be regenerated
+    deterministically from the repo; the user should compute it in their
+    environment and pin it before deploying this dashboard beyond localhost.
+  -->
+  <script src="https://cdn.tailwindcss.com"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+          crossorigin="anonymous"></script>
   <link rel="stylesheet" href="styles.css" />
   <script>
     tailwind.config = {

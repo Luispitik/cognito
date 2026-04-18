@@ -21,8 +21,8 @@ Cognito es un **sistema cognitivo compartible**. Las contribuciones que más val
 ## Setup de desarrollo
 
 ```bash
-# Clonar fork
-git clone https://github.com/TUUSUARIO/cognito.git
+# Clonar fork (reemplaza Luispitik con tu usuario si forkeaste)
+git clone https://github.com/Luispitik/cognito.git
 cd cognito
 
 # Crear entorno Python

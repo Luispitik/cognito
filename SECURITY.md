@@ -110,8 +110,10 @@ The attacker cannot, by Cognito's design:
 
 ## Known limitations
 
-- **`gate-validator.sh` is advisory** — a determined user can override gates with `/cognition-gate override <id>`. Gates protect against honest mistakes, not against malicious actors who already have shell access.
-- **`sinapsis_bridge.py` executes regex** from `_passive-triggers.json`. Malformed regex is caught; pathological regex (ReDoS) could stall a hook for seconds (CPU only, no crash). Mitigated by Python's `re` engine timeouts in CPython ≥ 3.11.
+- **`gate-validator.sh` is advisory** — a determined user can override gates via `/cognition-gate off <id>`. Gates protect against honest mistakes, not against malicious actors who already have shell access.
+- **`no-hardcode-pii` regex is narrow.** The default pattern `(email|telefono|phone|dni|nif|cif)\s*=\s*['"]...` catches literal assignments (`const email = "x@y.com"`) but **misses** JSON (`"email": "x"`), object shorthand (`{ email }`), Python dicts without quotes (`email="x"`), and most framework idioms. Treat it as best-effort defense in depth, **not** a compliance boundary. For real PII compliance use `gitleaks`, `trufflehog`, or a managed secrets scanner alongside Cognito. This gate is listed to be widened in the v1.2 roadmap via `gitleaks` subprocess invocation.
+- **`sinapsis_bridge.py` evaluates user-supplied regex** from `_passive-triggers.json`. Malformed regex is caught and logged; pathological regex (ReDoS) could stall a hook for seconds (CPU only, no crash). Mitigated by Python's `re` engine timeouts in CPython ≥ 3.11.
+- **`hookIntensity`** in `config/_phases.json` is not enforced today. Declared for API stability; no hook reads it. See ARCHITECTURE.md → Known limitations.
 
 ---
 

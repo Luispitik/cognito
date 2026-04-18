@@ -1,5 +1,12 @@
 # Cognito — Cognitive Operating System para Claude Code
 
+[![Tests](https://github.com/Luispitik/cognito/actions/workflows/test.yml/badge.svg)](https://github.com/Luispitik/cognito/actions/workflows/test.yml)
+[![Security](https://github.com/Luispitik/cognito/actions/workflows/security.yml/badge.svg)](https://github.com/Luispitik/cognito/actions/workflows/security.yml)
+[![Lint](https://github.com/Luispitik/cognito/actions/workflows/lint.yml/badge.svg)](https://github.com/Luispitik/cognito/actions/workflows/lint.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits)](https://www.conventionalcommits.org)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue)](CHANGELOG.md)
+
 **Cognito** es un sistema operativo de pensamiento que orquesta **7 modos cognitivos** según **5 fases de proyecto**, con **determinismo selectivo** en los puntos críticos y libertad creativa donde importa.
 
 Nace para corregir dos sesgos conocidos de los LLMs — **efecto ancla** y **convergencia prematura** — y los resuelve no con un único antídoto, sino con una infraestructura que:
@@ -129,52 +136,60 @@ Detalles en [dashboard/README.md](dashboard/README.md).
 ```
 cognito/
 ├── README.md · ARCHITECTURE.md · INSTALL.md · CONTRIBUTING.md · CHANGELOG.md
+├── ROADMAP.md · GOVERNANCE.md · CODE_OF_CONDUCT.md · SECURITY.md · AUTHORS.md · CITATION.cff
 ├── SKILL.md                      ← meta-orquestador
-├── config/                       ← 5 JSONs (estado + config)
+├── config/                       ← 6 JSONs (estado + config)
 ├── hooks/                        ← 4 scripts deterministas
 │   ├── phase-detector.sh         (UserPromptSubmit)
-│   ├── mode-injector.sh          (PreToolUse, consume bridge Sinapsis si existe)
+│   ├── mode-injector.sh          (UserPromptSubmit desde v1.1; pre-1.1 PreToolUse)
 │   ├── gate-validator.sh         (PreToolUse Write/Edit)
 │   └── session-closer.sh         (Stop)
 ├── modes/                        ← 7 skills hijas (divergente, verificador, ...)
 ├── phases/                       ← 5 specs de fase
-├── commands/                     ← 10 slash commands
+├── commands/                     ← 11 slash commands (incl. /cognition-gate desde v1.1)
 ├── templates/                    ← 5 plantillas estructuradas
-├── profiles/                     ← 4 YAML por audiencia
+├── profiles/                     ← 4 YAML por audiencia (ahora honrados por install.sh)
 ├── integrations/                 ← bridges opcionales
 │   ├── sinapsis_bridge.py        (auto-detect Sinapsis)
 │   └── README.md                 (cómo añadir más integraciones)
-├── dashboard/                    ← web estático
+├── dashboard/                    ← web estático hardened (127.0.0.1, allowlist)
 │   ├── index.html · app.js · styles.css
 │   ├── api/build_data.py         (consolida sessions + logs)
 │   ├── api/seed_demo.py          (datos demo)
 │   └── serve.sh
 ├── tests/
-│   ├── unit/ (pytest)            ← 180+ tests
+│   ├── unit/ (pytest)            ← tests por módulo
 │   ├── integration/ (pytest)     ← flows end-to-end
-│   ├── bats/hooks.bats           ← 20+ tests cross-shell (CI)
+│   ├── bats/hooks.bats           ← 22 tests cross-shell
 │   └── run_tests.sh
-├── scripts/install.sh, uninstall.sh
-└── .github/workflows/test.yml    ← CI Ubuntu + macOS × Python 3.10-3.12
+├── scripts/
+│   ├── install.sh                ← honra profile YAML, idempotente, auto-registra hooks vía jq
+│   ├── uninstall.sh              ← limpia settings.json vía jq
+│   └── update.sh                 ← refresh no-destructivo (v1.1+)
+├── docs/AUDIT-2026-04-18.md     ← auditoría que originó v1.1
+└── .github/workflows/            ← test + security + lint + release + stale
 ```
+
+**Test count (v1.1):** 204 pytest + 22 bats = 226.
 
 ---
 
 ## Instalación rápida
 
 ```bash
-# 1. Clonar o descargar Cognito
-git clone https://github.com/<YOUR_GITHUB_USER>/cognito.git
+# 1. Clonar
+git clone https://github.com/Luispitik/cognito.git ~/cognito
+cd ~/cognito
 
-# 2. Elegir perfil e instalar
-cd cognito
-./scripts/install.sh --profile=operator     # o alumno, public, client
+# 2. Instalar perfil (el YAML decide qué modos/hooks/gates se copian)
+bash scripts/install.sh --profile=operator   # o alumno | public | client
 
 # 3. Verificar
 /cognition-status
+/cognition-status --verify   # health check v1.1+
 ```
 
-Ver [INSTALL.md](INSTALL.md) para detalles por perfil.
+Ver [INSTALL.md](INSTALL.md) para detalles por perfil, opciones (--skip-settings, --target) y troubleshooting.
 
 ---
 

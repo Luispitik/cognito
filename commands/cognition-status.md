@@ -1,12 +1,28 @@
 ---
-description: Dashboard completo del estado de Cognito: perfil, fase, modos, hooks, gates, historial.
+description: Dashboard completo del estado de Cognito. Con --verify corre una auditoría de salud.
 ---
 
 # /cognition-status
 
 Dashboard del estado del sistema Cognito.
 
-## Tu tarea
+## Subcomandos
+
+- `/cognition-status` — dashboard legible (el formato de abajo).
+- `/cognition-status --verify` — ejecuta `scripts/cognition-verify.sh` y muestra el resultado. Útil para debuggear instalaciones rotas.
+- `/cognition-status --json` — vuelca los mismos datos como JSON (útil para scripting).
+
+Cuando el usuario añada `--verify`, corre **exactamente**:
+
+```bash
+bash ~/.claude/cognito/../cognito-repo/scripts/cognition-verify.sh
+```
+
+o si el repo no está cerca, ejecuta el script desde la carpeta de install
+(`~/.claude/cognito/scripts/cognition-verify.sh` si existe) y presenta el
+resultado. Exit code != 0 implica que al menos un check FAIL.
+
+## Tu tarea (modo dashboard, sin `--verify`)
 
 Lee los siguientes archivos y compón el dashboard:
 

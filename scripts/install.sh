@@ -321,7 +321,7 @@ SNIPPET_FILE="$TARGET_DIR/.settings-snippet.json"
 # Build the snippet from the enabled hooks only.
 export COGNITO_HOOKS_DIR="$TARGET_DIR/hooks"
 export COGNITO_ENABLED_HOOKS="$HOOKS"
-python3 <<PYEOF > "$SNIPPET_FILE"
+python3 <<'PYEOF' > "$SNIPPET_FILE"
 import json, os
 hooks_dir = os.environ["COGNITO_HOOKS_DIR"]
 enabled = os.environ["COGNITO_ENABLED_HOOKS"].split()

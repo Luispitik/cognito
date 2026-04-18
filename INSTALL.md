@@ -164,23 +164,28 @@ Merge this block into the `hooks` key of your `settings.json` (adjust the path i
 ## Troubleshooting
 
 ### `/cognition-status` does nothing
+
 - Re-open Claude Code (it reloads slash commands on session start).
 - Check `~/.claude/commands/cognition-status.md` exists.
 
 ### Hooks don't fire
+
 - `chmod +x ~/.claude/cognito/hooks/*.sh`.
 - Git Bash only on Windows — paths must be absolute in `settings.json`.
 - Run `/cognition-status --verify` to see which hooks the harness registered.
 
 ### A mode doesn't activate when I type `/divergir`
+
 - `~/.claude/skills/divergente/SKILL.md` must exist.
 - `config/_operator-config.json → modes.disabled` must NOT list that mode.
 
 ### A gate blocks something it shouldn't
+
 - Toggle via `/cognition-gate off <gate-id>` (or edit `_operator-config.json → gates.disabled`).
 - The PII gate (`no-hardcode-pii`) uses best-effort regex; see [SECURITY.md](SECURITY.md) → Known limitations.
 
 ### Install failed with `python3: command not found`
+
 - Python 3.10+ is required. Install from python.org (Windows) and tick "Add to PATH".
 - Git Bash usually exposes `python3` when Python is on PATH; otherwise `alias python3=python` in `~/.bashrc`.
 

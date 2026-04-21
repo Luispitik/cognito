@@ -31,9 +31,10 @@ from typing import Any
 # Genéricos primero, luego fallback a instalaciones personalizadas (operator profile).
 _CANDIDATE_ROOTS = [
     "~/.claude/skills/sinapsis",
+    "~/.claude/skills/norteia-continuous-learning",  # Sinapsis v4.3+ packaged as a global skill
     "~/.sinapsis",
     "~/sinapsis",
-    "~/.claude/skills/sinapsis-learning",  # fallback operator profile
+    "~/.claude/skills/sinapsis-learning",
 ]
 
 
@@ -301,6 +302,127 @@ class SinapsisBridge:
         version_note = f" (Sinapsis v{self.version})" if self.version else ""
         lines.append(f"\n_Fuente: Sinapsis bridge{version_note}._\n")
         return "\n".join(lines)
+
+    # ------------------------------------------------------------------ #
+    # v2.2 — Export a Claude `memory_20250818` tool entries (opt-in)
+    # ------------------------------------------------------------------ #
+
+    # Caracteres inválidos para nombres de fichero en Windows + POSIX combinados.
+    # Mantener conservador: sustituimos todo lo que no sea [A-Za-z0-9_.-] por '-'.
+    _MEMORY_SAFE_ID_RE = None  # set lazily to avoid top-level re import cost
+
+    @staticmethod
+    def _slugify_memory_id(raw: str) -> str:
+        import re
+
+        cleaned = re.sub(r"[^A-Za-z0-9_.-]+", "-", raw).strip("-.")
+        # Evita nombres vacíos o sólo separadores.
+        return cleaned or "instinct"
+
+    def to_memory_tool_entries(
+        self,
+        limit: int = 20,
+        scope: str | None = None,
+        base_path: str = "/memories",
+    ) -> list[dict]:
+        """
+        Map active Sinapsis instincts to Claude `memory_20250818` tool entries.
+
+        Each entry is a `create` command shaped like:
+            {
+              "command": "create",
+              "path": "/memories/{scope}/{safe_id}.md",
+              "content": "<markdown body>"
+            }
+
+        Notes
+        -----
+        * **Opt-in.** This method produces values only; it does not call the
+          tool handler. Callers are responsible for wiring the output into
+          whatever memory-tool adapter they run against Claude.
+        * Paths are always POSIX-style (forward slashes) because they address
+          logical memory slots, not on-disk files.
+        * Duplicate IDs within the same scope are deduplicated by appending
+          `-2`, `-3`, ... so every `path` is unique in the returned list.
+        * Content is truncated to ~1 KB per entry to keep the memory corpus
+          small; the original instinct payload stays in Sinapsis.
+        """
+        if not self.available:
+            return []
+
+        instincts = self.get_active_instincts(limit=limit, scope=scope)
+        if not instincts:
+            return []
+
+        entries: list[dict] = []
+        seen_paths: dict[str, int] = {}
+
+        for inst in instincts:
+            if not isinstance(inst, dict):
+                continue
+
+            rule = (
+                inst.get("rule")
+                or inst.get("body")
+                or inst.get("description")
+                or ""
+            ).strip()
+            if not rule:
+                continue
+
+            inst_scope = (inst.get("scope") or "global").strip() or "global"
+            safe_scope = self._slugify_memory_id(inst_scope)
+            raw_id = (
+                inst.get("id")
+                or inst.get("instinct_id")
+                or inst.get("slug")
+                or rule[:40]
+            )
+            safe_id = self._slugify_memory_id(str(raw_id))
+
+            path = f"{base_path.rstrip('/')}/{safe_scope}/{safe_id}.md"
+            if path in seen_paths:
+                seen_paths[path] += 1
+                path = (
+                    f"{base_path.rstrip('/')}/{safe_scope}/"
+                    f"{safe_id}-{seen_paths[path]}.md"
+                )
+            else:
+                seen_paths[path] = 1
+
+            title = inst.get("title") or inst.get("name") or safe_id
+            confidence = (inst.get("confidence") or inst.get("status") or "").strip()
+            occurrences = inst.get("occurrences")
+            domain = inst.get("domain") or inst.get("tags")
+
+            lines = [f"# {title}", "", rule[:900]]
+            meta: list[str] = []
+            if confidence:
+                meta.append(f"confidence: {confidence}")
+            if occurrences is not None:
+                meta.append(f"occurrences: {occurrences}")
+            if domain:
+                if isinstance(domain, (list, tuple)):
+                    meta.append(f"domain: {', '.join(str(d) for d in domain)}")
+                else:
+                    meta.append(f"domain: {domain}")
+            meta.append(f"scope: {inst_scope}")
+            if self.version:
+                meta.append(f"sinapsis: v{self.version}")
+
+            if meta:
+                lines.append("")
+                lines.append("_" + " · ".join(meta) + "_")
+
+            entries.append(
+                {
+                    "command": "create",
+                    "path": path,
+                    "content": "\n".join(lines),
+                }
+            )
+
+        return entries
 
     def status_dict(self) -> dict:
         """Resumen en dict para /cognition-status."""

@@ -96,7 +96,7 @@ bash scripts/uninstall.sh
 bash scripts/uninstall.sh --yes --target=~/.claude/cognito
 ```
 
-`uninstall.sh` removes the install directory, the 10 Cognito slash commands, the 7 mode skills, and — when jq is available — strips every `cognito-*` entry from `~/.claude/settings.json`.
+`uninstall.sh` removes the install directory, the 12 Cognito slash commands, the 7 mode skills, and — when jq is available — strips every `cognito-*` entry from `~/.claude/settings.json`.
 
 ## Manual installation (no script)
 

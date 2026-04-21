@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cognito — Cognitive Operating System · ISO/IEC 25010:2023</title>
+<meta name="description" content="Qué es Cognito (Cognitive Operating System para Claude Code) y su puntuación en ISO/IEC 25010:2023. Informe honesto v2.0.0-rc1.">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;
+  --surface:#12121a;
+  --card:#1a1a26;
+  --card-2:#1f1f2e;
+  --border:#2a2a3a;
+  --border-soft:#1f1f2e;
+  --accent:#6366f1;
+  --accent-2:#8b5cf6;
+  --accent-3:#a78bfa;
+  --pink:#ec4899;
+  --green:#22c55e;
+  --yellow:#eab308;
+  --orange:#f97316;
+  --red:#ef4444;
+  --cyan:#06b6d4;
+  --text:#e2e8f0;
+  --text-strong:#f8fafc;
+  --muted:#94a3b8;
+  --dim:#64748b;
+  --maxw:1180px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;font-feature-settings:'cv11','ss01','ss03'}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+/* ================================ HEADER ================================ */
+.header{
+  position:relative;
+  background:
+    radial-gradient(ellipse 800px 400px at 20% 0%, rgba(99,102,241,.25), transparent 60%),
+    radial-gradient(ellipse 600px 300px at 80% 10%, rgba(139,92,246,.2), transparent 60%),
+    linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%);
+  padding:80px 0 56px;
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+.header::before{
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(99,102,241,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,.06) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 700px 400px at 50% 30%, black, transparent 70%);
+  opacity:.5;
+  pointer-events:none;
+}
+.header-inner{position:relative}
+.header .eyebrow{
+  display:inline-flex; align-items:center; gap:10px;
+  font-size:.72rem; text-transform:uppercase; letter-spacing:.15em;
+  color:var(--muted); margin-bottom:24px;
+}
+.header .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.header h1{
+  font-size:clamp(2.2rem, 5vw, 3.6rem); font-weight:800; line-height:1.05;
+  letter-spacing:-.03em; color:var(--text-strong); max-width:900px;
+}
+.header h1 .gradient{
+  background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.header .lead{font-size:1.1rem; color:var(--muted); max-width:760px; margin-top:22px; line-height:1.6}
+.header .lead strong{color:var(--text-strong); font-weight:600}
+.header .lead em{color:var(--accent-3); font-style:normal}
+.header .pills{display:flex; flex-wrap:wrap; gap:10px; margin-top:28px}
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:.75rem; font-weight:500;
+  padding:6px 12px; border-radius:999px;
+  background:rgba(255,255,255,.04); border:1px solid var(--border); color:var(--muted);
+}
+.pill.green{background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.3); color:#4ade80}
+.pill.blue{background:rgba(99,102,241,.12); border-color:rgba(99,102,241,.3); color:#818cf8}
+.pill.purple{background:rgba(139,92,246,.12); border-color:rgba(139,92,246,.3); color:#c4b5fd}
+.pill.yellow{background:rgba(234,179,8,.12); border-color:rgba(234,179,8,.3); color:#fbbf24}
+.pill.red{background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.3); color:#f87171}
+.pill.cyan{background:rgba(6,182,212,.12); border-color:rgba(6,182,212,.3); color:#22d3ee}
+
+.header .meta-grid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:14px; margin-top:36px;
+}
+.meta-item{
+  background:rgba(255,255,255,.03); border:1px solid var(--border);
+  border-radius:12px; padding:16px 18px;
+  transition:border-color .2s, background .2s;
+}
+.meta-item:hover{border-color:var(--accent); background:rgba(99,102,241,.05)}
+.meta-item label{font-size:.68rem; text-transform:uppercase; letter-spacing:.12em; color:var(--dim); font-weight:600}
+.meta-item .value{display:block; font-size:2rem; font-weight:700; color:var(--text-strong); margin-top:2px; line-height:1}
+.meta-item .sub{display:block; font-size:.75rem; color:var(--muted); margin-top:6px; font-weight:400}
+
+/* ================================ TOC ================================ */
+.toc-wrap{
+  position:sticky; top:0; z-index:10;
+  background:rgba(10,10,15,.9); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.toc{
+  display:flex; gap:0; overflow-x:auto; scrollbar-width:none;
+  padding:14px 0; max-width:var(--maxw); margin:0 auto; padding-left:28px; padding-right:28px;
+}
+.toc::-webkit-scrollbar{display:none}
+.toc a{
+  font-size:.82rem; color:var(--muted); text-decoration:none; padding:6px 14px;
+  border-radius:999px; border:1px solid transparent; white-space:nowrap;
+  transition:color .15s, background .15s, border-color .15s;
+}
+.toc a:hover{color:var(--text-strong); background:rgba(99,102,241,.08)}
+.toc a.active{color:var(--text-strong); background:rgba(99,102,241,.15); border-color:rgba(99,102,241,.4)}
+
+/* ================================ SECTIONS ================================ */
+section{padding:72px 0; border-bottom:1px solid var(--border-soft)}
+section.alt{background:linear-gradient(180deg, #0d0d15 0%, #0a0a0f 100%)}
+.section-head{margin-bottom:36px; max-width:760px}
+.section-head .kicker{
+  font-size:.72rem; text-transform:uppercase; letter-spacing:.15em;
+  color:var(--accent-3); font-weight:600; margin-bottom:12px;
+}
+.section-head h2{
+  font-size:clamp(1.8rem, 3.5vw, 2.5rem); font-weight:700;
+  letter-spacing:-.02em; color:var(--text-strong); line-height:1.15;
+}
+.section-head p{font-size:1.02rem; color:var(--muted); margin-top:14px}
+
+/* ================================ PROBLEM/SYMPTOM TABLE ================================ */
+.sym-table{
+  width:100%; border-collapse:collapse; font-size:.88rem;
+  background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+}
+.sym-table thead{background:var(--card-2)}
+.sym-table th{
+  padding:14px 18px; text-align:left; font-size:.7rem; font-weight:600;
+  color:var(--accent-3); text-transform:uppercase; letter-spacing:.1em;
+}
+.sym-table td{padding:16px 18px; border-top:1px solid var(--border)}
+.sym-table tr:hover td{background:rgba(99,102,241,.04)}
+.sym-table td:first-child{color:var(--text-strong); font-weight:500}
+.sym-table td:nth-child(2){color:var(--muted); font-style:italic; font-size:.85rem}
+
+/* ================================ ARCHITECTURE DIAGRAM ================================ */
+.phase-flow{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:24px;
+  padding:28px; background:var(--card); border:1px solid var(--border); border-radius:14px;
+}
+.phase-step{
+  padding:10px 18px; border-radius:10px; font-weight:600; color:white; font-size:.9rem;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.phase-sep{color:var(--dim); font-size:1.2rem; font-weight:300}
+
+.determ-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-top:20px}
+.determ-card{
+  background:var(--card); border:1px solid var(--border); border-radius:14px; padding:22px;
+  position:relative; overflow:hidden; transition:border-color .2s, transform .2s;
+}
+.determ-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+}
+.determ-card.high::before{background:linear-gradient(90deg, var(--red), #b91c1c)}
+.determ-card.med::before{background:linear-gradient(90deg, var(--yellow), var(--orange))}
+.determ-card.low::before{background:linear-gradient(90deg, var(--green), #15803d)}
+.determ-card:hover{transform:translateY(-2px); border-color:var(--accent)}
+.determ-card h4{color:var(--text-strong); font-size:1rem; margin-bottom:8px; display:flex; align-items:center; gap:10px}
+.determ-card p{font-size:.88rem; color:var(--muted); line-height:1.6}
+
+/* ================================ MODES GRID ================================ */
+.modes-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:14px}
+.mode-card{
+  background:linear-gradient(135deg, var(--card) 0%, #18182a 100%);
+  border:1px solid var(--border); border-radius:14px; padding:22px;
+  position:relative; transition:transform .2s, border-color .2s, box-shadow .2s;
+  cursor:default;
+}
+.mode-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity:.5; border-radius:14px 14px 0 0;
+}
+.mode-card:hover{transform:translateY(-3px); border-color:var(--accent); box-shadow:0 10px 40px -10px rgba(99,102,241,.3)}
+.mode-card .mode-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.mode-card h3{font-size:1.05rem; font-weight:700; color:var(--text-strong)}
+.mode-card p{font-size:.85rem; color:var(--muted); line-height:1.6}
+.det-dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle}
+.det-dot.high{background:var(--red); box-shadow:0 0 6px var(--red)}
+.det-dot.med{background:var(--yellow); box-shadow:0 0 6px var(--yellow)}
+.det-dot.low{background:var(--green); box-shadow:0 0 6px var(--green)}
+
+.honesty-note{
+  margin-top:24px; padding:16px 20px;
+  background:rgba(234,179,8,.06); border:1px solid rgba(234,179,8,.25);
+  border-left:3px solid var(--yellow); border-radius:0 10px 10px 0;
+  font-size:.87rem; color:var(--muted);
+}
+.honesty-note strong{color:#fbbf24}
+
+/* ================================ ISO SCORECARD ================================ */
+.score-layout{display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start}
+@media(max-width:900px){.score-layout{grid-template-columns:1fr}}
+.score-chart-wrap{
+  background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px;
+  position:sticky; top:80px;
+}
+.score-chart-wrap h3{color:var(--text-strong); font-size:1rem; font-weight:600; margin-bottom:18px}
+.chart-box{
+  position:relative; width:100%; height:420px;
+  /* Explicit height is required by Chart.js 4 when maintainAspectRatio:false
+     — without it the canvas collapses to 0x0 inside a sticky container. */
+}
+@media(max-width:900px){.chart-box{height:360px}}
+.chart-legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px}
+.chart-legend .pill{font-size:.72rem}
+
+.score-list{display:flex; flex-direction:column; gap:12px}
+.score-item{
+  background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px;
+  transition:border-color .2s, background .2s;
+}
+.score-item:hover{border-color:var(--accent); background:var(--card-2)}
+.score-item .head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.score-item h4{color:var(--text-strong); font-size:1rem; font-weight:600}
+.score-values{font-size:.82rem; color:var(--muted); font-variant-numeric:tabular-nums; font-family:ui-monospace, SFMono-Regular, monospace}
+.score-values .was{color:var(--dim); text-decoration:line-through}
+.score-values .is{color:var(--text-strong); font-weight:700}
+.score-values .is.up{color:var(--green)}
+.score-values .is.flat{color:var(--yellow)}
+.score-values .target{color:var(--accent-3)}
+
+.score-bar{height:6px; background:var(--border-soft); border-radius:999px; overflow:hidden; margin-top:12px; position:relative}
+.score-bar .fill{height:100%; border-radius:999px; transition:width .3s}
+.score-bar .fill.ok{background:linear-gradient(90deg, var(--accent), var(--accent-2))}
+.score-bar .fill.warn{background:linear-gradient(90deg, var(--yellow), var(--orange))}
+.score-bar .fill.bad{background:linear-gradient(90deg, var(--red), #b91c1c)}
+.score-bar .target-marker{
+  position:absolute; top:-3px; bottom:-3px; width:2px;
+  background:var(--accent-3); opacity:.6;
+}
+.score-item .caption{font-size:.82rem; color:var(--muted); margin-top:10px; line-height:1.55}
+.score-item .caption code{background:var(--card-2); padding:2px 6px; border-radius:4px; font-size:.78rem; color:var(--accent-3); font-family:ui-monospace, monospace}
+
+.summary-total{
+  margin-top:18px; padding:20px 24px;
+  background:linear-gradient(135deg, rgba(99,102,241,.08) 0%, rgba(139,92,246,.04) 100%);
+  border:1px solid rgba(99,102,241,.25); border-radius:14px;
+  display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+}
+.summary-total .lbl{font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent-3); font-weight:600}
+.summary-total .big{font-size:1.6rem; font-family:ui-monospace, monospace; font-variant-numeric:tabular-nums}
+.summary-total .big .was{color:var(--red)}
+.summary-total .big .is{color:var(--green)}
+.summary-total .big .tgt{color:var(--accent-3)}
+.summary-total .arrow{color:var(--dim); font-weight:300}
+
+/* ================================ EVIDENCE STATS ================================ */
+.stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px}
+.stat-card{
+  background:var(--card); border:1px solid var(--border); border-radius:14px; padding:22px;
+  transition:transform .2s, border-color .2s;
+}
+.stat-card:hover{transform:translateY(-2px); border-color:var(--accent)}
+.stat-card .label{font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); font-weight:600; margin-bottom:10px}
+.stat-card .num{font-size:2.1rem; font-weight:800; color:var(--text-strong); line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+.stat-card .num .unit{font-size:1rem; font-weight:400; color:var(--muted); margin-left:4px}
+.stat-card .hint{font-size:.77rem; color:var(--muted); margin-top:8px; line-height:1.5}
+
+details.code-reveal{
+  margin-top:28px;
+  background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;
+}
+details.code-reveal summary{
+  list-style:none; cursor:pointer; padding:16px 20px;
+  font-weight:600; font-size:.9rem; color:var(--text-strong);
+  display:flex; align-items:center; gap:10px;
+}
+details.code-reveal summary::-webkit-details-marker{display:none}
+details.code-reveal summary .caret{display:inline-block; transition:transform .15s; color:var(--accent)}
+details.code-reveal[open] summary .caret{transform:rotate(90deg)}
+details.code-reveal pre{
+  margin:0; padding:0 20px 20px; font-size:.78rem; line-height:1.65;
+  overflow-x:auto; color:var(--text); font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+details.code-reveal code{color:var(--accent-3)}
+details.code-reveal pre .c{color:var(--dim)}
+details.code-reveal pre .k{color:var(--accent-3)}
+
+/* ================================ ROADMAP TIMELINE ================================ */
+.roadmap-grid{display:grid; grid-template-columns:1fr 1fr; gap:40px}
+@media(max-width:900px){.roadmap-grid{grid-template-columns:1fr}}
+.roadmap-col h3{
+  font-size:1.1rem; font-weight:700; color:var(--text-strong);
+  margin-bottom:22px; padding-bottom:10px; border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.roadmap-col h3 .count{font-size:.75rem; color:var(--muted); font-weight:500}
+
+.roadmap{position:relative; padding-left:28px}
+.roadmap::before{
+  content:''; position:absolute; left:8px; top:8px; bottom:8px; width:2px;
+  background:linear-gradient(to bottom, var(--accent), var(--accent-2), var(--green));
+}
+.rm-item{position:relative; margin-bottom:16px; padding:12px 16px; background:var(--card); border:1px solid var(--border); border-radius:10px}
+.rm-item::before{
+  content:''; position:absolute; left:-25px; top:18px;
+  width:12px; height:12px; border-radius:50%;
+  border:2px solid var(--accent); background:var(--bg);
+}
+.rm-item.done::before{background:var(--green); border-color:var(--green); box-shadow:0 0 10px var(--green)}
+.rm-item .rm-head{display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap}
+.rm-item .rm-head h4{font-size:.92rem; color:var(--text-strong); font-weight:600}
+.rm-item .rm-head .strike{text-decoration:line-through; color:var(--dim)}
+.rm-item p{font-size:.82rem; color:var(--muted); line-height:1.55}
+.rm-item p code{background:var(--card-2); padding:1px 6px; border-radius:4px; font-size:.76rem; color:var(--accent-3); font-family:ui-monospace, monospace}
+
+.tag-mini{
+  font-size:.62rem; font-weight:700; padding:2px 7px; border-radius:4px;
+  text-transform:uppercase; letter-spacing:.06em;
+}
+.tag-perf{background:rgba(234,179,8,.2); color:#fbbf24}
+.tag-port{background:rgba(34,197,94,.2); color:#4ade80}
+.tag-compat{background:rgba(6,182,212,.2); color:#22d3ee}
+.tag-use{background:rgba(236,72,153,.2); color:#f472b6}
+.tag-rel{background:rgba(249,115,22,.2); color:#fb923c}
+.tag-maint{background:rgba(99,102,241,.2); color:#818cf8}
+.tag-sec{background:rgba(239,68,68,.2); color:#f87171}
+.tag-safe{background:rgba(139,92,246,.2); color:#c4b5fd}
+.tag-func{background:rgba(148,163,184,.2); color:#cbd5e1}
+.tag-new{background:rgba(168,85,247,.2); color:#c084fc}
+.tag-break{background:rgba(239,68,68,.25); color:#fca5a5; font-weight:800}
+.tag-inst{background:rgba(20,184,166,.2); color:#2dd4bf}
+.tag-done{background:rgba(34,197,94,.25); color:#86efac; font-weight:700}
+
+/* ================================ HONEST LIMITS ================================ */
+.limits-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(330px, 1fr)); gap:16px}
+.limit-card{
+  background:rgba(239,68,68,.04); border:1px solid rgba(239,68,68,.2);
+  border-left:3px solid var(--red); border-radius:0 12px 12px 0; padding:20px 22px;
+}
+.limit-card h4{color:#f87171; font-size:.98rem; font-weight:700; margin-bottom:8px}
+.limit-card p{font-size:.86rem; color:var(--muted); line-height:1.6}
+.limit-card p code{background:var(--card-2); padding:2px 6px; border-radius:4px; font-size:.78rem; color:var(--accent-3); font-family:ui-monospace, monospace}
+
+.philosophy{
+  margin-top:44px; padding:28px 32px;
+  background:linear-gradient(135deg, rgba(99,102,241,.08) 0%, rgba(236,72,153,.05) 100%);
+  border:1px solid rgba(99,102,241,.25); border-radius:16px;
+  font-size:1.05rem; color:var(--text); line-height:1.7;
+  position:relative;
+}
+.philosophy::before{
+  content:'“'; position:absolute; top:-10px; left:20px;
+  font-size:5rem; color:var(--accent); font-family:Georgia, serif; line-height:1; opacity:.3;
+}
+.philosophy em{color:var(--accent-3); font-style:normal}
+
+/* ================================ FOOTER ================================ */
+footer{
+  background:#050508; border-top:1px solid var(--border);
+  padding:48px 0; color:var(--dim);
+}
+footer .inner{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:24px}
+footer .brand{display:flex; align-items:center; gap:12px}
+footer .logo{
+  width:40px; height:40px; border-radius:10px;
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  display:flex; align-items:center; justify-content:center;
+  color:white; font-weight:800; font-size:1.2rem; font-family:Georgia, serif;
+}
+footer .brand-text strong{color:var(--text-strong); font-size:1.05rem; display:block}
+footer .brand-text small{color:var(--muted); font-size:.78rem}
+footer nav{display:flex; gap:20px; flex-wrap:wrap}
+footer nav a{color:var(--muted); font-size:.85rem; text-decoration:none; transition:color .15s}
+footer nav a:hover{color:var(--accent-3)}
+
+/* ================================ UTILITIES ================================ */
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px}
+::selection{background:rgba(99,102,241,.4); color:white}
+
+/* ================================ RESPONSIVE ================================ */
+@media(max-width:760px){
+  .container{padding:0 20px}
+  .header{padding:56px 0 40px}
+  .header .meta-grid{grid-template-columns:1fr 1fr}
+  section{padding:56px 0}
+  .phase-flow{padding:20px; gap:8px}
+  .phase-step{padding:8px 14px; font-size:.82rem}
+  .roadmap-grid{gap:32px}
+}
+
+@media print{
+  body{background:white; color:black}
+  .toc-wrap, footer{display:none}
+  section{page-break-inside:avoid; border-bottom:1px solid #ccc}
+  .mode-card, .score-item, .stat-card, .rm-item{background:white; border-color:#ddd; color:black}
+  .score-chart-wrap{position:static}
+}
+</style>
+</head>
+<body>
+
+<!-- ========================================================================
+     HERO
+     ======================================================================== -->
+<header class="header">
+  <div class="container header-inner">
+    <div class="eyebrow">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Cognito · Cognitive Operating System</span>
+      <span aria-hidden="true">·</span>
+      <span>Informe ISO/IEC 25010:2023 · v2.1.0 · 2026-04-19</span>
+    </div>
+    <h1>
+      Un sistema operativo de <span class="gradient">pensamiento</span><br>
+      para Claude Code.
+    </h1>
+    <p class="lead">
+      Cognito orquesta <strong>7 modos cognitivos</strong> según <strong>5 fases de proyecto</strong>,
+      con <strong>determinismo selectivo</strong> en los puntos críticos y libertad creativa donde importa.
+      Nace para corregir dos sesgos conocidos de los LLMs — <em>efecto ancla</em> y
+      <em>convergencia prematura</em> — no con un único antídoto, sino con una infraestructura.
+    </p>
+    <div class="pills">
+      <a class="pill blue" href="https://github.com/Luispitik/cognito">github.com/Luispitik/cognito</a>
+      <span class="pill green">289 tests verdes</span>
+      <span class="pill purple">MIT License</span>
+      <span class="pill yellow">v2.1.0 — alineado con Claude Opus 4.7</span>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <label>Modos</label>
+        <span class="value">7</span>
+        <small class="sub">divergente · estratega · devil's · consolidador · ejecutor · verificador · auditor</small>
+      </div>
+      <div class="meta-item">
+        <label>Fases</label>
+        <span class="value">5</span>
+        <small class="sub">discovery · planning · execution · review · shipping</small>
+      </div>
+      <div class="meta-item">
+        <label>Hooks deterministas</label>
+        <span class="value">4</span>
+        <small class="sub">phase-detector · mode-injector · gate-validator · session-closer</small>
+      </div>
+      <div class="meta-item">
+        <label>Perfiles</label>
+        <span class="value">4</span>
+        <small class="sub">operator · alumno · public · client</small>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================================================================
+     TABLE OF CONTENTS (sticky)
+     ======================================================================== -->
+<div class="toc-wrap">
+  <nav class="toc" aria-label="Índice del informe">
+    <a href="#que-es">¿Qué es?</a>
+    <a href="#problema">Qué resuelve</a>
+    <a href="#arquitectura">Arquitectura</a>
+    <a href="#modos">Los 7 modos</a>
+    <a href="#iso">ISO 25010 Scorecard</a>
+    <a href="#evidencia">Evidencia</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#limites">Lo que no arreglará</a>
+  </nav>
+</div>
+
+<!-- ========================================================================
+     SYMPTOM TABLE
+     ======================================================================== -->
+<section id="problema">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">El punto de partida</div>
+      <h2>¿Qué problema resuelve?</h2>
+      <p>Síntomas típicos que aparecen al trabajar con LLMs sin andamiaje. Cognito responde con el modo adecuado activado en el momento adecuado, no con un prompt mágico.</p>
+    </div>
+
+    <table class="sym-table">
+      <thead>
+        <tr>
+          <th scope="col">Síntoma LLM</th>
+          <th scope="col">Causa cognitiva</th>
+          <th scope="col">Respuesta de Cognito</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Acepta tu primera propuesta sin cuestionar</td>
+          <td>Efecto ancla</td>
+          <td><span class="pill blue">Divergente</span> + hook anti-ancla en Discovery</td>
+        </tr>
+        <tr>
+          <td>Genera outputs plausibles pero incorrectos</td>
+          <td>Alucinación · no verifica</td>
+          <td><span class="pill red">Verificador</span> activo en Execution</td>
+        </tr>
+        <tr>
+          <td>Se desvía de instrucciones claras</td>
+          <td>No hay checklist forzado</td>
+          <td><span class="pill red">Ejecutor</span> + plantillas rígidas + gate-validator</td>
+        </tr>
+        <tr>
+          <td>Decides "porque sí" sin comparar alternativas</td>
+          <td>Falta convergencia explícita</td>
+          <td><span class="pill yellow">Consolidador</span> + matriz de decisión obligatoria</td>
+        </tr>
+        <tr>
+          <td>Entregas algo y luego sale el problema que no viste</td>
+          <td>No hubo pre-mortem</td>
+          <td><span class="pill yellow">Devil's Advocate</span> en Planning</td>
+        </tr>
+        <tr>
+          <td>No hay reflexión post-proyecto</td>
+          <td>Falta ciclo de review</td>
+          <td><span class="pill purple">Auditor</span> en Review</td>
+        </tr>
+        <tr>
+          <td>Decides tácticamente sin mirar el marco mayor</td>
+          <td>Miopía estratégica</td>
+          <td><span class="pill cyan">Estratega</span> en Discovery y Planning</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ========================================================================
+     ARCHITECTURE
+     ======================================================================== -->
+<section id="arquitectura" class="alt">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">La fórmula</div>
+      <h2>Arquitectura en una frase</h2>
+      <p style="font-size:1.15rem">
+        <strong style="color:var(--text-strong)">Fases</strong> <span style="color:var(--dim)">(cuándo)</span>
+        <span style="color:var(--dim);margin:0 6px">×</span>
+        <strong style="color:var(--text-strong)">Modos</strong> <span style="color:var(--dim)">(cómo pensar)</span>
+        <span style="color:var(--dim);margin:0 6px">×</span>
+        <strong style="color:var(--text-strong)">Hooks</strong> <span style="color:var(--dim)">(qué es determinista)</span>
+        <span style="color:var(--dim);margin:0 6px">×</span>
+        <strong style="color:var(--text-strong)">Perfiles</strong> <span style="color:var(--dim)">(para quién)</span>
+        <span style="color:var(--accent-3);margin:0 8px">=</span>
+        <strong style="color:var(--accent-3)">Cognito</strong>
+      </p>
+    </div>
+
+    <h3 style="font-size:.8rem; text-transform:uppercase; letter-spacing:.12em; color:var(--dim); margin-bottom:14px">Las 5 fases · flujo y retornos</h3>
+    <div class="phase-flow">
+      <span class="phase-step" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">Discovery</span>
+      <span class="phase-sep" aria-hidden="true">→</span>
+      <span class="phase-step" style="background:linear-gradient(135deg,#ec4899,#db2777)">Planning</span>
+      <span class="phase-sep" aria-hidden="true">→</span>
+      <span class="phase-step" style="background:linear-gradient(135deg,#f59e0b,#d97706)">Execution</span>
+      <span class="phase-sep" aria-hidden="true">→</span>
+      <span class="phase-step" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">Review</span>
+      <span class="phase-sep" aria-hidden="true">→</span>
+      <span class="phase-step" style="background:linear-gradient(135deg,#10b981,#059669)">Shipping</span>
+    </div>
+    <p style="font-size:.85rem; color:var(--muted); margin-top:14px">
+      Cualquier fase puede volver a Discovery si aparece una sorpresa.
+      No es un workflow rígido — son estados con transiciones permisivas.
+    </p>
+
+    <h3 style="font-size:.8rem; text-transform:uppercase; letter-spacing:.12em; color:var(--dim); margin:44px 0 14px">Determinismo selectivo · dónde sí, dónde no</h3>
+    <div class="determ-grid">
+      <article class="determ-card high">
+        <h4><span class="det-dot high"></span>Alto · gates críticos</h4>
+        <p>Anti-patrones (<code style="background:var(--card-2);padding:1px 5px;border-radius:4px;font-size:.8rem;color:var(--accent-3)">n8n</code>, RLS obligatorio, no hardcodear PII). Hook <code style="background:var(--card-2);padding:1px 5px;border-radius:4px;font-size:.8rem;color:var(--accent-3)">gate-validator.sh</code> bloquea Write/Edit antes de ejecutar.</p>
+      </article>
+      <article class="determ-card med">
+        <h4><span class="det-dot med"></span>Medio · outputs estructurados</h4>
+        <p>Matriz decisión, pre-mortem, checklist de deploy. Plantilla fija, Claude rellena pero no altera la estructura.</p>
+      </article>
+      <article class="determ-card low">
+        <h4><span class="det-dot low"></span>Bajo · ideación libre</h4>
+        <p>Divergencia, análisis profundo, síntesis creativa. Sin plantilla. Solo prompts que fomentan variedad.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================================
+     MODES
+     ======================================================================== -->
+<section id="modos">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">Catálogo</div>
+      <h2>Los 7 modos cognitivos</h2>
+      <p>Uno para cada momento del ciclo. Se activan por fase, por slash-command explícito o por detección de verbalización. Nunca pisan la agencia del usuario: sugieren, no fuerzan.</p>
+    </div>
+
+    <div class="modes-grid">
+      <article class="mode-card">
+        <div class="mode-head">
+          <h3>Divergente</h3>
+          <span class="pill blue">Discovery</span>
+        </div>
+        <p><span class="det-dot low"></span>Determinismo bajo. Anti-ancla. 10 marcos mentales. Obliga a 5+ alternativas antes de permitir convergencia.</p>
+      </article>
+      <article class="mode-card">
+        <div class="mode-head">
+          <h3>Estratega</h3>
+          <span class="pill cyan">Discovery · Planning</span>
+        </div>
+        <p><span class="det-dot low"></span>Determinismo bajo. Time-horizon shift, cambio de stakeholder, trade-offs macro. Contra la miopía táctica.</p>
+      </article>
+      <article class="mode-card">
+        <div class="mode-head">
+          <h3>Devil's Advocate</h3>
+          <span class="pill yellow">Planning · Review</span>
+        </div>
+        <p><span class="det-dot med"></span>Determinismo medio (plantilla). Pre-mortem estructurado + steel-man del opuesto. Crítica sistemática antes de decidir.</p>
+      </article>
+      <article class="mode-card">
+        <div class="mode-head">
+          <h3>Consolidador</h3>
+          <span class="pill yellow">Planning</span>
+        </div>
+        <p><span class="det-dot med"></span>Determinismo medio (matriz). Convergencia explícita con criterios ponderados. Adiós "porque sí".</p>
+      </article>
+      <article class="mode-card">
+        <div class="mode-head">
+          <h3>Ejecutor</h3>
+          <span class="pill red">Execution · Shipping</span>
+        </div>
+        <p><span class="det-dot high"></span>Determinismo alto (hook + plantilla). Checklists rígidas. Zero drift. Bloquea cambios de dirección no autorizados.</p>
+      </article>
+      <article class="mode-card">
+        <div class="mode-head">
+          <h3>Verificador</h3>
+          <span class="pill red">Execution · Shipping</span>
+        </div>
+        <p><span class="det-dot high"></span>Determinismo alto (gate). Anti-alucinación. Fact-check. Bloquea cifras sin fuente y claims no verificables.</p>
+      </article>
+      <article class="mode-card">
+        <div class="mode-head">
+          <h3>Auditor</h3>
+          <span class="pill purple">Review</span>
+        </div>
+        <p><span class="det-dot high"></span>Determinismo alto (plantilla). Post-mortem, QA de outputs, lessons learned. El ciclo se cierra aprendiendo.</p>
+      </article>
+    </div>
+
+    <div class="honesty-note">
+      <strong>Nota honesta</strong> (ARCHITECTURE.md §13): en la práctica Estratega ≈ Divergente en marcos,
+      y Devil's Advocate ≈ Auditor en estructura. <em>Realistic distinct count</em> = 3-5. Collapse planeado
+      para v2.0 preservando API (el operador sigue invocando <code style="background:var(--card-2);padding:1px 6px;border-radius:4px;font-size:.78rem;color:var(--accent-3);font-family:ui-monospace,monospace">/estratega</code> como preset).
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================================
+     ISO 25010 SCORECARD
+     ======================================================================== -->
+<section id="iso" class="alt">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">ISO/IEC 25010:2023 · puntuación honesta 0–5</div>
+      <h2>Scorecard — 9 características, evidencia cuantitativa</h2>
+      <p>Comparamos <strong style="color:#f87171">v1.1.0</strong> (auditoría original) contra
+         <strong style="color:#818cf8">v1.2</strong> (4 gaps de rediseño cerrados) y
+         <strong style="color:#4ade80">v2.0.0-rc1</strong> (daemon + collapse + marketplace).
+         Todas las mediciones reproducibles con los comandos en <code style="background:var(--card-2);padding:2px 6px;border-radius:4px;color:var(--accent-3);font-family:ui-monospace,monospace">docs/VERIFY-v2.md</code>.</p>
+    </div>
+
+    <div class="score-layout">
+      <!-- RADAR CHART -->
+      <div class="score-chart-wrap">
+        <h3 id="radar-title">Radar de 9 dimensiones</h3>
+        <div class="chart-box">
+          <canvas id="chart-radar" role="img"
+                  aria-labelledby="radar-title"
+                  aria-describedby="radar-desc"></canvas>
+        </div>
+        <p id="radar-desc" class="sr-only">
+          Gráfica radar comparando las 9 características de ISO 25010 entre v1.1.0 (baseline),
+          v1.2 (gaps de rediseño cerrados) y v2.0.0-rc1 (daemon + collapse + marketplace).
+          La versión verde v2.0.0-rc1 sube respecto a v1.2 en Performance, Compatibility,
+          Maintainability y Portability; el resto de dimensiones se mantienen.
+        </p>
+        <div class="chart-legend">
+          <span class="pill red">v1.1.0 · media 3.20</span>
+          <span class="pill blue">v2.0.0-rc1 · media 4.14</span>
+          <span class="pill green">v2.1.0 · media 4.26</span>
+        </div>
+      </div>
+
+      <!-- SCORE LIST -->
+      <div class="score-list">
+        <article class="score-item">
+          <div class="head">
+            <h4>1. Functional Suitability</h4>
+            <div class="score-values"><span class="was">3.7</span> → 4.3 → <span class="is up">4.5</span></div>
+          </div>
+          <div class="score-bar"><span class="fill ok" style="width:90%"></span></div>
+          <p class="caption">v2.1: +1 command (<code>/cognition-effort</code> → 12). <code>recommendedEffort</code> por modo hace al sistema consumible por harnesses que usan <code>output_config.effort</code> de Opus 4.7.</p>
+        </article>
+
+        <article class="score-item">
+          <div class="head">
+            <h4>2. Performance Efficiency</h4>
+            <div class="score-values"><span class="was">2.3</span> → 3.3 → <span class="is up">3.5</span></div>
+          </div>
+          <div class="score-bar"><span class="fill warn" style="width:70%"></span></div>
+          <p class="caption">v2.0 daemon: cold 633→hot 485 ms (−23 %). v2.1 sube budget 16k→48k → primer bundle de modos ya supera el mínimo de cache de Opus 4.7 (4096 tok) → cache hits reales en turns 2+. Cliente nativo queda v2.2.</p>
+        </article>
+
+        <article class="score-item">
+          <div class="head">
+            <h4>3. Compatibility</h4>
+            <div class="score-values"><span class="was">3.3</span> → <span>4.0</span> → <span class="is up">4.2</span></div>
+          </div>
+          <div class="score-bar"><span class="fill ok" style="width:84%"></span></div>
+          <p class="caption">v1.2: auto-detect Sinapsis en <code>norteia-continuous-learning</code>. v2.0: marketplace abre <code>modes/custom/</code> para skills de terceros con sha256 verification opcional.</p>
+        </article>
+
+        <article class="score-item">
+          <div class="head">
+            <h4>4. Usability</h4>
+            <div class="score-values"><span class="was">3.0</span> → <span class="is flat">3.8</span> → <span class="is flat">3.8</span></div>
+          </div>
+          <div class="score-bar"><span class="fill ok" style="width:76%"></span></div>
+          <p class="caption">Dashboard pasa WCAG 2.2 A baseline desde v1.1.1. v2.0 añade <code>/estratega</code> con redirección a preset (API estable). Lighthouse score ≥ 90 pendiente para v2.1.</p>
+        </article>
+
+        <article class="score-item">
+          <div class="head">
+            <h4>5. Reliability</h4>
+            <div class="score-values"><span class="was">3.2</span> → <span class="is up">4.0</span> → <span class="is flat">4.0</span></div>
+          </div>
+          <div class="score-bar"><span class="fill ok" style="width:80%"></span></div>
+          <p class="caption">v1.2: <code>/cognition-verify --repair</code> restaura JSON corrupto con backup forense. v2.0: daemon con fallback transparente (client exit 127 → cold path). Sobrevive a 3 sesiones paralelas.</p>
+        </article>
+
+        <article class="score-item">
+          <div class="head">
+            <h4>6. Security</h4>
+            <div class="score-values"><span class="was">4.0</span> → <span class="is flat">4.0</span> → <span class="is flat">4.0</span></div>
+          </div>
+          <div class="score-bar"><span class="fill ok" style="width:80%"></span></div>
+          <p class="caption">v1.1.0 cerró 3 HIGH + 2 MEDIUM. v2.0 daemon Windows usa token hex 16 bytes + permisos 600. <code>install-mode.sh</code> valida sha256 opcional. Gitleaks subprocess sigue pendiente (v2.1).</p>
+        </article>
+
+        <article class="score-item">
+          <div class="head">
+            <h4>7. Maintainability</h4>
+            <div class="score-values"><span class="was">3.5</span> → 4.3 → <span class="is up">4.4</span></div>
+          </div>
+          <div class="score-bar"><span class="fill ok" style="width:88%"></span></div>
+          <p class="caption">v2.1: 946 stmts, 58 % cover. +20 tests específicos de effort (config integrity, injector semantics, budget, anti-regresión Opus 4.7). Subprocess coverage del daemon sigue pendiente.</p>
+        </article>
+
+        <article class="score-item">
+          <div class="head">
+            <h4>8. Portability</h4>
+            <div class="score-values"><span class="was">2.8</span> → <span>3.5</span> → <span class="is up">3.8</span></div>
+          </div>
+          <div class="score-bar"><span class="fill warn" style="width:76%"></span></div>
+          <p class="caption">v1.1.1: CI Windows + Linux + macOS × 3 Python versions. v2.0 daemon usa AF_UNIX en POSIX y AF_INET+token en Windows — mismo protocolo JSON-line sobre ambos transports.</p>
+        </article>
+
+        <article class="score-item">
+          <div class="head">
+            <h4>9. Safety</h4>
+            <div class="score-values"><span class="was">3.0</span> → <span class="is up">3.8</span> → <span class="is flat">3.8</span></div>
+          </div>
+          <div class="score-bar"><span class="fill ok" style="width:76%"></span></div>
+          <p class="caption">v1.2: <code>install.sh --dry-run</code> muestra plan sin tocar FS. v2.0 collapse es opt-in (<code>collapseV2=false</code> default) → byte-for-byte compat con installs previos.</p>
+        </article>
+
+        <div class="summary-total">
+          <div>
+            <div class="lbl">Media global</div>
+            <div class="big"><span class="was">3.20</span> <span class="arrow">→</span> <span style="color:#818cf8">4.14</span> <span class="arrow">→</span> <span class="is">4.26</span></div>
+          </div>
+          <p style="font-size:.82rem; color:var(--muted); max-width:280px; text-align:right">
+            +1.06 absoluto desde el baseline v1.1.0. v2.1 alinea con Opus 4.7: effort hint por modo, budget 16k→48k, +20 tests.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================================
+     EVIDENCE
+     ======================================================================== -->
+<section id="evidencia">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">Lo que respalda las puntuaciones</div>
+      <h2>Evidencia cuantitativa</h2>
+      <p>Todas las métricas son locales y reproducibles. Windows 11 Git Bash + Python 3.14 + pytest 8.x + radon 6.0.1 + pytest-cov 7.1.0. Fixture <code style="background:var(--card-2);padding:2px 6px;border-radius:4px;color:var(--accent-3);font-family:ui-monospace,monospace">tests/fixtures/typical-prompt.json</code> (500 palabras).</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">Tests v2.1.0</div>
+        <div class="num">289<span class="unit">/ 311</span></div>
+        <p class="hint">289 pytest + 22 bats. 18 skipped en Windows. +20 tests v2.1 (effort hint, budget, anti-regresión Opus 4.7).</p>
+      </div>
+      <div class="stat-card">
+        <div class="label">Latencia hook (daemon ON)</div>
+        <div class="num">485<span class="unit">ms</span></div>
+        <p class="hint">avg 3 runs. Cold path: 633 ms. Δ = −148 ms (23 %). Cliente nativo queda v2.1.</p>
+      </div>
+      <div class="stat-card">
+        <div class="label">Cobertura total medida</div>
+        <div class="num">57<span class="unit">%</span></div>
+        <p class="hint">902 stmts. <code>_daemon.py</code> 17 % (subprocess no trackeado), resto 58-84 %. Meta v2.1: 80 %+.</p>
+      </div>
+      <div class="stat-card">
+        <div class="label">Daemon lifecycle</div>
+        <div class="num">4<span class="unit">cmds</span></div>
+        <p class="hint"><code>cognito-daemon.sh</code> start/stop/restart/status. AF_UNIX Linux+macOS, AF_INET+token Windows.</p>
+      </div>
+      <div class="stat-card">
+        <div class="label">LOC v2.0 Python</div>
+        <div class="num">1.1<span class="unit">k</span></div>
+        <p class="hint">796 v1.2 (hooks) + 277 daemon + 93 cognito-daemon.sh + 187 install-mode.sh.</p>
+      </div>
+      <div class="stat-card">
+        <div class="label">Collapse aliases</div>
+        <div class="num">2<span class="unit">/7</span></div>
+        <p class="hint">estratega → divergente (preset: time-horizon) y devils-advocate → auditor (preset: pre-mortem). Opt-in.</p>
+      </div>
+      <div class="stat-card">
+        <div class="label">Effort hint (v2.1)</div>
+        <div class="num">7<span class="unit">modos</span></div>
+        <p class="hint">Cada modo declara <code style="background:var(--card-2);padding:1px 5px;border-radius:4px;color:var(--accent-3)">recommendedEffort</code> (low/med/high/max). Verificador + Auditor = <strong>max</strong>. Override vía <code style="background:var(--card-2);padding:1px 5px;border-radius:4px;color:var(--accent-3)">/cognition-effort</code>.</p>
+      </div>
+      <div class="stat-card">
+        <div class="label">Budget inyección</div>
+        <div class="num">48<span class="unit">K chars</span></div>
+        <p class="hint">v2.1 sube 16k→48k. Divergente (6.5k) ya no se trunca. Cruza el mínimo de cache de Opus 4.7 (4096 tokens).</p>
+      </div>
+      <div class="stat-card">
+        <div class="label">Commands</div>
+        <div class="num">12<span class="unit">slash</span></div>
+        <p class="hint">+1 en v2.1: <code style="background:var(--card-2);padding:1px 5px;border-radius:4px;color:var(--accent-3)">/cognition-effort</code> fuerza nivel o vuelve a recomendación automática.</p>
+      </div>
+    </div>
+
+    <details class="code-reveal">
+      <summary><span class="caret" aria-hidden="true">▸</span> Comandos exactos ejecutados (reproducibles)</summary>
+<pre><span class="c"># Tests + cobertura</span>
+python -m pytest tests/unit tests/integration \
+  --cov=hooks --cov=integrations --cov=dashboard --cov=scripts \
+  --cov-report=term --cov-report=json
+<span class="c"># → 225 passed, 13 skipped in 11.74s</span>
+
+<span class="c"># Latencia: 5 iteraciones por hook con fixture de 500 palabras</span>
+<span class="k">for</span> hook <span class="k">in</span> phase-detector mode-injector gate-validator session-closer; <span class="k">do</span>
+  <span class="k">for</span> i <span class="k">in</span> 1..5; <span class="k">do</span> time bash hooks/$hook.sh &lt; tests/fixtures/typical-prompt.json; <span class="k">done</span>
+<span class="k">done</span>
+
+<span class="c"># Complejidad ciclomática (Radon)</span>
+python -m radon cc -a -s integrations/ dashboard/api/
+python -m radon mi integrations/ dashboard/api/
+
+<span class="c"># LOC</span>
+find . -name <span class="k">"*.sh"</span> -not -path <span class="k">"./.git/*"</span> | xargs wc -l
+find . -name <span class="k">"*.py"</span> -not -path <span class="k">"*__pycache__*"</span> | xargs wc -l</pre>
+    </details>
+  </div>
+</section>
+
+<!-- ========================================================================
+     ROADMAP
+     ======================================================================== -->
+<section id="roadmap" class="alt">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">Plan determinista</div>
+      <h2>Plan de crecimiento — v1.2 &amp; v2.0</h2>
+      <p>Cada item tiene criterio de aceptación <strong>test-passable</strong> o contable. Nada de "mejorar la mantenibilidad". Los ítems ya cerrados en v1.2 o v2.0.0-rc1 aparecen tachados para que se vea el delta real acumulado.</p>
+    </div>
+
+    <div class="roadmap-grid">
+      <!-- v1.2 -->
+      <div class="roadmap-col">
+        <h3>v1.2.0 — targeted <span class="count">15 items · 5 ya cerrados</span></h3>
+        <div class="roadmap">
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-perf">Perf</span><h4>Benchmark de hooks en CI</h4></div>
+            <p>Falla si p95 &gt; 300 ms en Linux / 600 ms en Windows sobre <code>typical-prompt.json</code>. Nuevo <code>tests/perf/test_hook_latency.py</code>.</p>
+          </div>
+          <div class="rm-item done">
+            <div class="rm-head"><span class="tag-mini tag-done">Done</span><span class="tag-mini tag-port">Port</span><h4 class="strike">Windows en CI matrix</h4></div>
+            <p>Matrix ahora incluye <code>windows-latest</code> × Python 3.10/3.11/3.12. Git Bash, <code>jq</code> via choco, shim <code>python3</code>. Bats skipped con razón.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-maint">Maint</span><h4>Cobertura real de hooks</h4></div>
+            <p><code>COVERAGE_PROCESS_START</code> + <code>sitecustomize.py</code>. Extraer heredocs a <code>hooks/python/*.py</code>. Meta ≥ 80 % combined.</p>
+          </div>
+          <div class="rm-item done">
+            <div class="rm-head"><span class="tag-mini tag-done">Done</span><span class="tag-mini tag-compat">Compat</span><h4 class="strike">Auto-detect Sinapsis v4.3</h4></div>
+            <p><code>_CANDIDATE_ROOTS += ~/.claude/skills/norteia-continuous-learning</code>. 3 tests nuevos (<code>TestAutoDetectCandidates</code>) lockean el caso real.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-compat">Compat</span><span class="tag-mini tag-sec">Sec</span><h4>Schema lock del bridge</h4></div>
+            <p><code>integrations/schemas/sinapsis.v4.schema.json</code>. Fallo <em>loud</em> si no cumple (hoy devuelve lista vacía silente).</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-perf">Perf</span><h4>Activación condicional phase-detector</h4></div>
+            <p>Early-exit bash sin arrancar Python si el prompt no matches triggers. −40 % latencia esperada en ~70 % de prompts.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-maint">Maint</span><h4>JSONL logs en todos los hooks</h4></div>
+            <p>Dashboard deja de parsear con regex. <code>jq . logs/*.log</code> debe pasar. Estructura <code>{ts, session_id, hook, event, outcome}</code>.</p>
+          </div>
+          <div class="rm-item done">
+            <div class="rm-head"><span class="tag-mini tag-done">Done</span><span class="tag-mini tag-use">Use</span><h4 class="strike">Dashboard a11y baseline</h4></div>
+            <p>Skip-link, landmarks, <code>aria-live</code>, canvas <code>role="img"</code> con descripción, focus ring, table caption, CSS fallback <code>.sr-only</code>.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-rel">Rel</span><span class="tag-mini tag-safe">Safe</span><h4><code>/cognition-status --repair</code></h4></div>
+            <p>Si <code>_phase-state.json</code> no es JSON válido: copia <code>.default</code>, log en <code>logs/incidents.log</code>. Test E2E.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-maint">Maint</span><h4>Generador de fuentes de truth</h4></div>
+            <p><code>scripts/generate-mode-bindings.py</code> lee frontmatter de <code>modes/*/SKILL.md</code> y regenera <code>_phases.json.defaultModes</code>. 1 sola fuente.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-sec">Sec</span><h4>Gitleaks en gate-validator</h4></div>
+            <p>Si <code>gitleaks detect --no-git</code> disponible y encuentra match en content, bloquea. Fallback al regex actual.</p>
+          </div>
+          <div class="rm-item done">
+            <div class="rm-head"><span class="tag-mini tag-done">Done</span><span class="tag-mini tag-func">Func</span><h4 class="strike">Stale v1.0 + count "10 commands"</h4></div>
+            <p>Footer dashboard dinámico desde <code>data.json.version</code>. SECURITY.md y INSTALL.md consistentes.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-safe">Safe</span><h4><code>install.sh --dry-run</code></h4></div>
+            <p>Muestra plan sin crear <code>$TARGET_DIR</code> ni tocar <code>settings.json</code>. Test: invocar no modifica FS.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-inst">Inst</span><h4>Auto-sugerir jq si falta</h4></div>
+            <p>Detecta SO y sugiere <code>winget install jqlang.jq</code> / <code>brew install jq</code> / <code>apt install jq</code>.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-func">Func</span><h4>CI: count-claim consistency</h4></div>
+            <p>Job valida que cuentas en README coinciden con archivos reales. Falla si no.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- v2.0 -->
+      <div class="roadmap-col">
+        <h3>v2.0.0 — strategic <span class="count">8 items · rediseño</span></h3>
+        <div class="roadmap">
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-break">Break</span><h4>Collapse modos redundantes</h4></div>
+            <p>Estratega → Divergente como preset "time-horizon". Devil's Advocate → Auditor con modifier pre/post-mortem. 5 modos + 2 modifiers. Comandos antiguos redirigen.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-new">New</span><h4>Modes custom por usuario</h4></div>
+            <p><code>modes/custom/*/SKILL.md</code> + registro en <code>_modes.json</code>. Install detecta. Test: crear modo custom y <code>/modo mi-modo</code>.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-perf">Perf</span><h4>Daemon Python persistente</h4></div>
+            <p><code>cognito-daemon</code> escucha en socket Unix / named pipe Windows. Hooks son wrappers &lt; 5 ms. Benchmark: p95 ≤ 50 ms en Linux.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-new">New</span><h4>Marketplace de modes + gates</h4></div>
+            <p>Repo público <code>cognito-community</code>. <code>install-mode.sh &lt;slug&gt;</code> descarga desde manifest. Verificación firma opcional.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-new">New</span><h4>Semver por modo</h4></div>
+            <p>Cada <code>modes/*/SKILL.md</code> frontmatter con <code>version:</code> propia. <code>update.sh</code> detecta updates granulares (hoy todos 1.0.0).</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-break">Break</span><h4>Drop <code>hookIntensity</code></h4></div>
+            <p><code>grep -r "hookIntensity" | wc -l == 0</code>. Config declarada pero nunca leída por ningún hook. Muerto desde v1.0.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-new">New</span><h4>Profile en runtime</h4></div>
+            <p><code>/cognition-profile alumno</code> cambia sin reinstall. Persiste en <code>_operator-config.json.profile</code>. Útil para sesiones puntuales de formación.</p>
+          </div>
+          <div class="rm-item">
+            <div class="rm-head"><span class="tag-mini tag-break">Break</span><span class="tag-mini tag-port">Port</span><h4>Hooks como <code>python3 -m cognito.hooks.*</code></h4></div>
+            <p>Adiós heredocs. Portable Windows/Linux/Mac sin <code>cygpath</code>. Unit-testable directamente. Quoting traps desaparecen.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================================
+     HONEST LIMITS
+     ======================================================================== -->
+<section id="limites">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">Lo que se hizo · lo que queda</div>
+      <h2>Gaps cerrados en v1.2 y v2.0 · nuevos targets v2.1</h2>
+      <p>Los 4 gaps "de rediseño" identificados en la auditoría v1.1 están cerrados. v2.0 añade 3 piezas más (daemon, collapse, marketplace). Quedan 3 ítems nuevos para v2.1 documentados abajo.</p>
+    </div>
+
+    <div class="limits-grid">
+      <article class="limit-card" style="background:rgba(74,222,128,.04); border-color:rgba(74,222,128,.25); border-left-color:var(--green)">
+        <h4 style="color:#86efac">Performance — hecho parcial</h4>
+        <p>v1.2 fast-path bash + v2.0 daemon: 635 → 485 ms, <strong>−150 ms (23 %)</strong>. Medido. El 90 % proyectado requiere cliente nativo (Go/Rust), tracked v2.1.</p>
+      </article>
+      <article class="limit-card" style="background:rgba(74,222,128,.04); border-color:rgba(74,222,128,.25); border-left-color:var(--green)">
+        <h4 style="color:#86efac">Maintainability — hecho</h4>
+        <p>v1.2: heredocs extraídos a <code>hooks/python/*.py</code> con <code>_common.py</code> compartido. Cobertura medible pasó de 171 stmts a 902 stmts (57 % total, 73-84 % por módulo).</p>
+      </article>
+      <article class="limit-card" style="background:rgba(74,222,128,.04); border-color:rgba(74,222,128,.25); border-left-color:var(--green)">
+        <h4 style="color:#86efac">Reliability — hecho</h4>
+        <p>v1.2: <code>cognition-verify.sh --repair</code> detecta JSON corrupto, backup forense <code>.broken.&lt;ts&gt;.json</code>, restaura de <code>.default</code>, audit trail en <code>logs/incidents.log</code>.</p>
+      </article>
+      <article class="limit-card" style="background:rgba(74,222,128,.04); border-color:rgba(74,222,128,.25); border-left-color:var(--green)">
+        <h4 style="color:#86efac">Safety — hecho</h4>
+        <p>v1.2: <code>install.sh --dry-run</code> imprime cada <code>cp/mkdir/chmod</code> que ejecutaría sin tocar FS. v2.0 collapse es opt-in (<code>collapseV2=false</code> default).</p>
+      </article>
+      <article class="limit-card">
+        <h4>v2.1 — cliente nativo del daemon</h4>
+        <p>El bash wrapper sigue spawnando Python para el <code>client</code>. Un binario Go/Rust de ~5 ms + cliente compilado bajaría la latencia de 485 ms a ~250 ms. Trabajo real.</p>
+      </article>
+      <article class="limit-card">
+        <h4>v2.1 — subprocess coverage</h4>
+        <p>Los tests end-to-end del daemon usan <code>subprocess.run</code>, que pytest-cov no instrumenta. <code>COVERAGE_PROCESS_START</code> + <code>sitecustomize.py</code> subirían la cobertura real del daemon del 17 % al 80 %+.</p>
+      </article>
+      <article class="limit-card">
+        <h4>v2.1 — gitleaks en gate-validator</h4>
+        <p>Hoy <code>no-hardcode-pii</code> sigue siendo regex narrow. Shell-out a <code>gitleaks detect --no-git</code> cuando el binario esté disponible cerraría el último gap real de seguridad.</p>
+      </article>
+    </div>
+
+    <div class="philosophy">
+      Pensar mejor no es pensar más, es pensar con el <em>modo correcto</em> en el <em>momento correcto</em>.
+      El determinismo es caro y útil: gástalo en las <em>gates críticas</em>, no en la ideación.
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================================
+     FOOTER
+     ======================================================================== -->
+<footer>
+  <div class="container inner">
+    <div class="brand">
+      <div class="logo">C</div>
+      <div class="brand-text">
+        <strong>Cognito v2.1.0</strong>
+        <small>Cognitive Operating System · MIT License · 2026-04-19</small>
+      </div>
+    </div>
+    <nav aria-label="Enlaces del informe">
+      <a href="https://github.com/Luispitik/cognito">GitHub</a>
+      <a href="./QUALITY-ISO25010-2026-04-18.md">Auditoría ISO (MD)</a>
+      <a href="./AUDIT-2026-04-18.md">Audit v1.1 (MD)</a>
+      <a href="./VERIFY-v2.md">Verify v2.0 (MD)</a>
+      <a href="../CHANGELOG.md">Changelog</a>
+      <a href="../ROADMAP.md">Roadmap</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // ========================================================================
+  // Radar chart (Chart.js 4.4)
+  // ========================================================================
+  // Multi-line labels in Chart.js 4: use arrays of strings (one per line).
+  // Previously we used "\n" which only displays in tooltips, not on the radar axes.
+  const DIMS = [
+    ['Functional', 'Suitability'],
+    ['Performance', 'Efficiency'],
+    ['Compatibility'],
+    ['Usability'],
+    ['Reliability'],
+    ['Security'],
+    ['Maintainability'],
+    ['Portability'],
+    ['Safety'],
+  ];
+  // Scores backed by measurements in docs/VERIFY-v2.md.
+  // v1.1.0 = starting point; v1.2 = 4 redesign gaps closed; v2.0.0-rc1 = daemon+collapse+marketplace.
+  const V110  = [3.7, 2.3, 3.3, 3.0, 3.2, 4.0, 3.5, 2.8, 3.0];
+  const V20RC = [4.3, 3.3, 4.2, 3.8, 4.0, 4.0, 4.3, 3.8, 3.8];
+  const V21   = [4.5, 3.5, 4.3, 4.0, 4.0, 4.0, 4.4, 3.8, 3.8];
+
+  const radarCanvas = document.getElementById('chart-radar');
+  const radarChart = new Chart(radarCanvas.getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: DIMS,
+      datasets: [
+        {
+          label: 'v1.1.0 (baseline)',
+          data: V110,
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.08)',
+          borderWidth: 1.5,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointBackgroundColor: '#ef4444',
+          pointBorderColor: '#ef4444',
+        },
+        {
+          label: 'v2.0.0-rc1 (daemon+collapse+marketplace)',
+          data: V20RC,
+          borderColor: '#818cf8',
+          backgroundColor: 'rgba(99, 102, 241, 0.12)',
+          borderWidth: 2,
+          pointRadius: 3.5,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#818cf8',
+          pointBorderColor: '#c7d2fe',
+          pointBorderWidth: 1.5,
+        },
+        {
+          label: 'v2.1.0 (Opus 4.7 alignment)',
+          data: V21,
+          borderColor: '#4ade80',
+          backgroundColor: 'rgba(74, 222, 128, 0.22)',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#4ade80',
+          pointBorderColor: '#d1fae5',
+          pointBorderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: 8 },
+      scales: {
+        r: {
+          min: 0,
+          max: 5,
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+            color: '#64748b',
+            backdropColor: 'transparent',
+            font: { size: 10 },
+            showLabelBackdrop: false,
+          },
+          angleLines: { color: 'rgba(148,163,184,0.18)' },
+          grid: { color: 'rgba(148,163,184,0.18)', circular: false },
+          pointLabels: {
+            color: '#e2e8f0',
+            font: { size: 11, weight: '500', family: "'Inter', system-ui, sans-serif" },
+            padding: 8,
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#e2e8f0', padding: 14, font: { size: 12 }, usePointStyle: true, boxWidth: 10 },
+        },
+        tooltip: {
+          backgroundColor: '#12121a',
+          titleColor: '#f8fafc',
+          bodyColor: '#e2e8f0',
+          borderColor: '#2a2a3a',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            title: (items) => {
+              const lbl = items[0].label;
+              return Array.isArray(lbl) ? lbl.join(' ') : lbl;
+            },
+            label: (ctx) => `${ctx.dataset.label}: ${ctx.formattedValue} / 5`,
+          },
+        },
+      },
+    },
+  });
+
+  // Force a resize after layout settles (sticky containers can mis-measure
+  // on first paint when the sidebar flexes).
+  window.addEventListener('load', () => radarChart.resize());
+  new ResizeObserver(() => radarChart.resize()).observe(radarCanvas.parentElement);
+
+  // ========================================================================
+  // TOC scroll-spy
+  // ========================================================================
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('.toc a');
+  const setActive = (id) => {
+    tocLinks.forEach(a => {
+      const active = a.getAttribute('href') === '#' + id;
+      a.classList.toggle('active', active);
+    });
+  };
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) setActive(e.target.id);
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+</body>
+</html>

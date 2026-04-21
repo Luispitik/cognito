@@ -86,15 +86,24 @@ function renderHeader(data) {
 
   const phase = (data.status && data.status.currentPhase) || 'unknown';
   const phaseColor = PALETTE.phases[phase] || PALETTE.muted;
-  document.getElementById('status-phase').innerHTML = `
-    <span class="w-2 h-2 rounded-full" style="background:${esc(phaseColor)}"></span>
+  const statusPhase = document.getElementById('status-phase');
+  statusPhase.innerHTML = `
+    <span class="w-2 h-2 rounded-full" style="background:${esc(phaseColor)}" aria-hidden="true"></span>
     <span class="phase-pill" data-phase="${esc(phase)}">${esc(phase)}</span>
   `;
+  statusPhase.setAttribute('aria-label', `Fase activa: ${phase}`);
 
   const profile = (data.status && data.status.profile) || '-';
   document.getElementById('status-profile').innerHTML = `
     perfil: <strong>${esc(profile)}</strong>
   `;
+
+  const versionEl = document.getElementById('dashboard-version');
+  if (versionEl && data.version) {
+    versionEl.textContent = `Cognito v${data.version}`;
+  } else if (versionEl) {
+    versionEl.textContent = 'Cognito';
+  }
 }
 
 function renderKPIs(data) {
@@ -222,21 +231,27 @@ function renderGates(data) {
   const container = document.getElementById('gates-list');
   const gates = (data.gatesBreakdown || []).slice(0, 10);
   if (gates.length === 0) {
-    container.innerHTML = '<div class="empty">Sin gates disparados (todo limpio)</div>';
+    container.innerHTML = '<div class="empty" role="status">Sin gates disparados (todo limpio)</div>';
     return;
   }
   const max = Math.max(...gates.map(g => g.count));
   container.innerHTML = gates.map(g => {
     const pct = Number.isFinite(max) && max > 0 ? (g.count / max) * 100 : 0;
+    const pctLabel = pct.toFixed(0);
     return `
-    <div class="gate-row">
+    <div class="gate-row" role="listitem" aria-label="Gate ${esc(g.gate)} disparado ${g.count} veces (${pctLabel} por ciento del máximo)">
       <div class="flex-1 min-w-0">
         <code class="block truncate">${esc(g.gate)}</code>
-        <div class="mt-1 h-1 bg-slate-100 rounded overflow-hidden">
+        <div class="mt-1 h-1 bg-slate-100 rounded overflow-hidden"
+             role="progressbar"
+             aria-valuenow="${esc(g.count)}"
+             aria-valuemin="0"
+             aria-valuemax="${esc(max)}"
+             aria-label="Frecuencia de ${esc(g.gate)}">
           <div style="width:${pct.toFixed(2)}%" class="h-full bg-err/60"></div>
         </div>
       </div>
-      <span class="count ml-3">${fmt(g.count)}</span>
+      <span class="count ml-3" aria-hidden="true">${fmt(g.count)}</span>
     </div>
   `;
   }).join('');

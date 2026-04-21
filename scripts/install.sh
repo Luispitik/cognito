@@ -20,6 +20,7 @@ PROFILE=""
 CLIENT_INTAKE=""
 TARGET_DIR="${HOME}/.claude/cognito"
 SKIP_SETTINGS=0
+DRY_RUN=0
 SETTINGS_FILE="${HOME}/.claude/settings.json"
 
 for arg in "$@"; do
@@ -29,9 +30,10 @@ for arg in "$@"; do
         --target=*)         TARGET_DIR="${arg#*=}"    ;;
         --settings=*)       SETTINGS_FILE="${arg#*=}" ;;
         --skip-settings)    SKIP_SETTINGS=1           ;;
+        --dry-run|-n)       DRY_RUN=1                 ;;
         --help|-h)
             cat <<'EOF'
-Cognito installer (v1.1.0)
+Cognito installer (v1.2.0)
 
 Usage: bash scripts/install.sh --profile=<name> [options]
 
@@ -42,15 +44,35 @@ Profiles (defined in profiles/*.yaml):
   client     B2B client (requires --client-intake)
 
 Options:
+  --profile=NAME        operator | alumno | public | client   (required)
   --target=PATH         Install directory (default: ~/.claude/cognito)
   --settings=PATH       settings.json to update (default: ~/.claude/settings.json)
   --skip-settings       Do not touch settings.json; print the snippet instead
   --client-intake=PATH  Intake JSON (only for --profile=client)
+  --dry-run, -n         Show the install plan without touching the filesystem
+                        or settings.json. Useful to audit what an install
+                        would change before running it for real.
 EOF
             exit 0
             ;;
     esac
 done
+
+# Dry-run helpers: every destructive action routes through these so the
+# --dry-run flag is honored in one place instead of N conditionals.
+dry_log() {
+    if [ "$DRY_RUN" = "1" ]; then
+        echo "   [dry-run] would $*"
+    fi
+}
+_run() {
+    # $1..$N = command to execute. In --dry-run mode, prints and returns 0.
+    if [ "$DRY_RUN" = "1" ]; then
+        echo "   [dry-run] $*"
+        return 0
+    fi
+    "$@"
+}
 
 # --- Required args ---------------------------------------------------------
 if [ -z "$PROFILE" ]; then
@@ -104,6 +126,7 @@ echo "=========================================="
 echo " profile : $PROFILE"
 echo " target  : $TARGET_DIR"
 echo " jq      : $([ $HAVE_JQ = 1 ] && echo yes || echo no)"
+echo " dry-run : $([ $DRY_RUN = 1 ] && echo YES || echo no)"
 echo "=========================================="
 echo
 
@@ -174,17 +197,17 @@ if [ -d "$TARGET_DIR" ]; then
     BACKUP_ROOT="${HOME}/.claude/cognito-backups"
     TS=$(date -u +"%Y%m%dT%H%M%SZ")
     BACKUP_DIR="$BACKUP_ROOT/$TS"
-    mkdir -p "$BACKUP_ROOT"
+    _run mkdir -p "$BACKUP_ROOT"
     echo "-> Existing install detected. Backing up to $BACKUP_DIR"
-    cp -r "$TARGET_DIR" "$BACKUP_DIR"
+    _run cp -r "$TARGET_DIR" "$BACKUP_DIR"
 fi
 
-mkdir -p "$TARGET_DIR"/{config,hooks,logs,sessions,integrations}
-mkdir -p "$TARGET_DIR/logs/archive"
+_run mkdir -p "$TARGET_DIR/config" "$TARGET_DIR/hooks" "$TARGET_DIR/logs" "$TARGET_DIR/sessions" "$TARGET_DIR/integrations"
+_run mkdir -p "$TARGET_DIR/logs/archive"
 
 # --- Copy client intake (after target dir exists) --------------------------
 if [ "$PROFILE" = "client" ] && [ -n "$CLIENT_INTAKE" ]; then
-    cp "$CLIENT_INTAKE" "$TARGET_DIR/config/intake.json"
+    _run cp "$CLIENT_INTAKE" "$TARGET_DIR/config/intake.json"
     echo "-> Intake copied to $TARGET_DIR/config/intake.json"
 fi
 
@@ -196,25 +219,41 @@ for hook in $HOOKS; do
         echo "   (skip) hook source missing: $src" >&2
         continue
     fi
-    cp "$src" "$TARGET_DIR/hooks/"
-    chmod +x "$TARGET_DIR/hooks/${hook}.sh"
+    _run cp "$src" "$TARGET_DIR/hooks/"
+    _run chmod +x "$TARGET_DIR/hooks/${hook}.sh"
     echo "   ok  hooks/${hook}.sh"
 done
 
+# v1.2: ship the extracted Python modules alongside the bash wrappers so
+# `hooks/<name>.sh` can exec their sibling `hooks/python/<name>.py`.
+if [ -d "$REPO_DIR/hooks/python" ]; then
+    echo "   ok  hooks/python/ (shared modules for all wrappers)"
+    _run mkdir -p "$TARGET_DIR/hooks/python"
+    if [ "$DRY_RUN" != "1" ]; then
+        cp -r "$REPO_DIR/hooks/python/." "$TARGET_DIR/hooks/python/"
+    else
+        echo "   [dry-run] cp -r hooks/python/. -> $TARGET_DIR/hooks/python/"
+    fi
+fi
+
 # --- Copy all config JSONs (runtime-filtered, not install-filtered) -------
 echo "-> Installing config..."
-cp "$REPO_DIR/config/"*.json "$TARGET_DIR/config/"
+if [ "$DRY_RUN" = "1" ]; then
+    echo "   [dry-run] cp config/*.json -> $TARGET_DIR/config/"
+else
+    cp "$REPO_DIR/config/"*.json "$TARGET_DIR/config/"
+fi
 
 # Preserve existing _phase-state.json (idempotency). Otherwise seed from default.
 if [ -f "$TARGET_DIR/config/_phase-state.json" ] && [ -s "$TARGET_DIR/config/_phase-state.json" ]; then
     echo "   ok  preserved _phase-state.json"
 else
-    cp "$REPO_DIR/config/_phase-state.default.json" "$TARGET_DIR/config/_phase-state.json"
+    _run cp "$REPO_DIR/config/_phase-state.default.json" "$TARGET_DIR/config/_phase-state.json"
     echo "   ok  seeded _phase-state.json from default"
 fi
 
 # --- Copy templates listed in the profile ---------------------------------
-mkdir -p "$TARGET_DIR/templates"
+_run mkdir -p "$TARGET_DIR/templates"
 echo "-> Installing templates..."
 for tpl in $TEMPLATES; do
     src="$REPO_DIR/templates/${tpl}.md"
@@ -222,35 +261,39 @@ for tpl in $TEMPLATES; do
         echo "   (skip) template source missing: $src" >&2
         continue
     fi
-    cp "$src" "$TARGET_DIR/templates/"
+    _run cp "$src" "$TARGET_DIR/templates/"
     echo "   ok  templates/${tpl}.md"
 done
 
 # Phases and SKILL.md are architectural invariants (not per-profile).
-cp -r "$REPO_DIR/phases" "$TARGET_DIR/"
-cp "$REPO_DIR/SKILL.md" "$TARGET_DIR/"
+_run cp -r "$REPO_DIR/phases" "$TARGET_DIR/"
+_run cp "$REPO_DIR/SKILL.md" "$TARGET_DIR/"
 
 # Sinapsis bridge (runtime detection — safe to ship always).
 if [ -d "$REPO_DIR/integrations" ]; then
-    cp -r "$REPO_DIR/integrations/." "$TARGET_DIR/integrations/"
+    if [ "$DRY_RUN" = "1" ]; then
+        echo "   [dry-run] cp -r integrations/. -> $TARGET_DIR/integrations/"
+    else
+        cp -r "$REPO_DIR/integrations/." "$TARGET_DIR/integrations/"
+    fi
 fi
 
 # --- Copy modes into ~/.claude/skills/{mode}/ -----------------------------
 echo "-> Installing modes (skills)..."
-mkdir -p "$HOME/.claude/skills"
+_run mkdir -p "$HOME/.claude/skills"
 for mode in $MODES; do
     src="$REPO_DIR/modes/$mode"
     if [ ! -d "$src" ]; then
         echo "   (skip) mode source missing: $src" >&2
         continue
     fi
-    cp -r "$src" "$HOME/.claude/skills/"
+    _run cp -r "$src" "$HOME/.claude/skills/"
     echo "   ok  skills/$mode"
 done
 
 # --- Copy commands: the ones tied to each enabled mode + meta commands ----
 echo "-> Installing commands..."
-mkdir -p "$HOME/.claude/commands"
+_run mkdir -p "$HOME/.claude/commands"
 
 # Map mode -> slash command filename.
 # Keeps operator UX identical to v1.0 for modes that ship by default.
@@ -266,7 +309,11 @@ copy_cmd() {
     local name="$1"
     local src="$REPO_DIR/commands/${name}.md"
     if [ -f "$src" ]; then
-        cp "$src" "$HOME/.claude/commands/"
+        if [ "$DRY_RUN" = "1" ]; then
+            echo "   [dry-run] cp commands/${name}.md -> ~/.claude/commands/"
+        else
+            cp "$src" "$HOME/.claude/commands/"
+        fi
         echo "   ok  commands/${name}.md"
     fi
 }
@@ -276,6 +323,7 @@ copy_cmd "fase"
 copy_cmd "modo"
 copy_cmd "cognition-status"
 copy_cmd "cognition-gate"
+copy_cmd "cognition-effort"
 
 for mode in $MODES; do
     case "$mode" in
@@ -290,6 +338,11 @@ for mode in $MODES; do
 done
 
 # --- Apply profile-derived runtime config ---------------------------------
+if [ "$DRY_RUN" = "1" ]; then
+    echo "-> [dry-run] would apply profile '$PROFILE' to $TARGET_DIR/config/_operator-config.json"
+    echo "              modes.enabled = $MODES"
+    echo "              gates.enabled = $GATES"
+else
 echo "-> Applying profile config..."
 export COGNITO_CONFIG_PATH="$TARGET_DIR/config/_operator-config.json"
 export COGNITO_PROFILE="$PROFILE"
@@ -333,8 +386,19 @@ print(f"  ok  modes enabled  : {', '.join(modes_block['enabled']) or '<none>'}")
 print(f"  ok  gates enabled  : {', '.join(gates_block['enabled']) or '<none>'}")
 PYEOF
 unset COGNITO_CONFIG_PATH COGNITO_PROFILE COGNITO_INSTALL_PLAN
+fi  # end of dry-run guard
 
 # --- Auto-register hooks in settings.json ---------------------------------
+if [ "$DRY_RUN" = "1" ]; then
+    echo "-> [dry-run] would write settings.json snippet for hooks: $HOOKS"
+    echo "              target: $SETTINGS_FILE (--skip-settings: $SKIP_SETTINGS)"
+    echo
+    echo "=========================================="
+    echo " Dry-run complete — no files were touched"
+    echo "=========================================="
+    exit 0
+fi
+
 SNIPPET_FILE="$TARGET_DIR/.settings-snippet.json"
 
 # Build the snippet from the enabled hooks only.

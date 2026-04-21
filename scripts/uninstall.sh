@@ -62,7 +62,7 @@ if [ -d "$TARGET_DIR" ]; then
 fi
 
 # --- Remove Cognito commands ---------------------------------------------
-for cmd in fase modo cognition-status cognition-gate divergir verificar devils-advocate consolidar ejecutar estratega auditar; do
+for cmd in fase modo cognition-status cognition-gate cognition-effort divergir verificar devils-advocate consolidar ejecutar estratega auditar; do
     f="$HOME/.claude/commands/${cmd}.md"
     [ -f "$f" ] && rm "$f"
 done

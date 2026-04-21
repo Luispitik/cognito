@@ -97,3 +97,54 @@ table tbody tr:last-child { border-bottom: none; }
   color: #94a3b8;
   font-size: 0.875rem;
 }
+
+/* Accessibility helpers — fallback in case Tailwind CDN is unreachable.
+   Mirrors Tailwind's `.sr-only` and `.focus:not-sr-only` utilities. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Visible focus ring baseline when Tailwind's focus-visible utilities are
+   stripped by a strict CSP. Keyboard users must see where they are. */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
+/* Respect user motion preferences (WCAG 2.3.3 Animation from Interactions).
+   Disables transform/box-shadow transitions on KPI cards and any other
+   transition/animation without hiding visual affordances. Keyboard focus
+   rings remain intact because they don't rely on transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .kpi:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}

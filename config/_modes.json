@@ -1,12 +1,29 @@
 {
-  "version": "1.0.0",
-  "description": "Definición de los 7 modos de pensamiento de Cognito. Cada modo tiene triggers (para auto-activación), plantilla (si aplica), y nivel de determinismo.",
+  "version": "2.0.0",
+  "description": "Definición de los 7 modos de pensamiento de Cognito. Cada modo tiene triggers (para auto-activación), plantilla (si aplica), y nivel de determinismo. v2.0 introduce `collapseV2` aliasing: Estratega deja de ser un modo y pasa a ser un preset de Divergente (time-horizon); Devil's Advocate queda como preset pre-mortem de Auditor. El flag `operator-config.modes.collapseV2` (default false) activa el nuevo comportamiento sin romper instalaciones previas.",
+  "collapseV2": {
+    "description": "Consolidación de modos redundantes. Activa con operator-config.modes.collapseV2=true. La API (slash commands) se preserva: /estratega sigue funcionando pero aplica el preset correspondiente al modo consolidado.",
+    "aliases": {
+      "estratega": { "collapsesInto": "divergente", "preset": "time-horizon" },
+      "devils-advocate": { "collapsesInto": "auditor", "preset": "pre-mortem" }
+    }
+  },
+  "effortGuidance": {
+    "description": "v2.1: Cognito mapea determinism + momento cognitivo a un hint de effort para Claude Opus 4.7+. mode_injector emite este hint al final del systemMessage; operator_config.modes.overrideEffort lo puede anular.",
+    "mapping": {
+      "low": "medium",
+      "medium": "high",
+      "high": "high"
+    },
+    "allowedValues": ["low", "medium", "high", "max"]
+  },
   "modes": {
     "divergente": {
       "displayName": "Divergente",
       "description": "Anti-ancla, ideación, exploración de alternativas con 10 marcos mentales.",
       "skillPath": "modes/divergente/SKILL.md",
       "determinism": "low",
+      "recommendedEffort": "high",
       "template": null,
       "triggers": {
         "phrases": [
@@ -36,6 +53,7 @@
       "description": "Fact-check, anti-alucinación, validación de afirmaciones antes de acción.",
       "skillPath": "modes/verificador/SKILL.md",
       "determinism": "high",
+      "recommendedEffort": "max",
       "template": null,
       "gateHook": "gate-validator.sh",
       "triggers": {
@@ -58,6 +76,7 @@
       "description": "Pre-mortem, steel-man del opuesto, crítica estructurada.",
       "skillPath": "modes/devils-advocate/SKILL.md",
       "determinism": "medium",
+      "recommendedEffort": "high",
       "template": "templates/pre-mortem.md",
       "triggers": {
         "phrases": [
@@ -80,6 +99,7 @@
       "description": "Convergencia explícita, matriz de decisión, síntesis.",
       "skillPath": "modes/consolidador/SKILL.md",
       "determinism": "medium",
+      "recommendedEffort": "high",
       "template": "templates/matriz-decision.md",
       "triggers": {
         "phrases": [
@@ -101,6 +121,7 @@
       "description": "Checklists rígidas, plantillas fijas, foco sin desviación.",
       "skillPath": "modes/ejecutor/SKILL.md",
       "determinism": "high",
+      "recommendedEffort": "medium",
       "template": "templates/checklist-deploy.md",
       "gateHook": "gate-validator.sh",
       "triggers": {
@@ -123,6 +144,7 @@
       "description": "Time-horizon shift, cambio de stakeholder, trade-offs macro.",
       "skillPath": "modes/estratega/SKILL.md",
       "determinism": "low",
+      "recommendedEffort": "high",
       "template": null,
       "triggers": {
         "phrases": [
@@ -144,6 +166,7 @@
       "description": "Post-mortem, QA de outputs, extracción de lessons learned.",
       "skillPath": "modes/auditor/SKILL.md",
       "determinism": "high",
+      "recommendedEffort": "max",
       "template": "templates/auditoria-output.md",
       "triggers": {
         "phrases": [

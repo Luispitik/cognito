@@ -14,8 +14,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.10", "3.11", "3.12"]
+
+    defaults:
+      run:
+        # On Windows runners the default shell is PowerShell, but hooks and
+        # tests assume Bash. Git Bash ships pre-installed on windows-latest.
+        shell: bash
 
     steps:
       - name: Checkout
@@ -25,6 +31,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Expose `python3` alias on Windows
+        if: runner.os == 'Windows'
+        run: |
+          python_exe=$(python -c "import sys; print(sys.executable)")
+          python_dir=$(dirname "$python_exe")
+          # GitHub Actions path injection for subsequent steps.
+          echo "$python_dir" >> "$GITHUB_PATH"
+          # Some distributions do not provide a `python3` shim on Windows.
+          if [ ! -f "$python_dir/python3.exe" ]; then
+            cp "$python_exe" "$python_dir/python3.exe"
+          fi
 
       - name: Install dependencies
         run: |
@@ -39,7 +57,12 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install jq
 
+      - name: Install jq (Windows)
+        if: runner.os == 'Windows'
+        run: choco install jq -y --no-progress
+
       - name: Make hooks executable
+        if: runner.os != 'Windows'
         run: chmod +x hooks/*.sh tests/run_tests.sh
 
       - name: Run unit tests
@@ -64,6 +87,9 @@ jobs:
         run: brew install bats-core
 
       - name: Run bats tests
+        # bats-core does not support Windows natively (requires WSL).
+        # Tracked in ROADMAP.md v1.2 → "Windows in CI".
+        if: runner.os != 'Windows'
         run: bats tests/bats/hooks.bats
 
   syntax-check:

@@ -46,10 +46,13 @@
   </script>
 </head>
 <body class="bg-paper text-ink min-h-screen">
-  <header class="border-b border-slate-200 bg-white sticky top-0 z-10">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-white focus:px-3 focus:py-1.5 focus:rounded focus:border focus:border-accent focus:z-20">
+    Saltar al contenido
+  </a>
+  <header class="border-b border-slate-200 bg-white sticky top-0 z-10" role="banner">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-ink text-paper font-display text-lg flex items-center justify-center">
+        <div class="w-9 h-9 rounded-lg bg-ink text-paper font-display text-lg flex items-center justify-center" aria-hidden="true">
           C
         </div>
         <div>
@@ -58,100 +61,117 @@
         </div>
       </div>
       <div class="flex items-center gap-4 text-sm">
-        <div id="status-phase" class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-accent"></span>
+        <div id="status-phase" class="flex items-center gap-2" role="status" aria-live="polite" aria-label="Fase activa">
+          <span class="w-2 h-2 rounded-full bg-accent" aria-hidden="true"></span>
           <span class="text-muted">Cargando…</span>
         </div>
-        <div id="status-profile" class="text-muted hidden md:block"></div>
-        <button id="btn-refresh" class="px-3 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50 text-sm transition">
-          ↻ Refrescar
+        <div id="status-profile" class="text-muted hidden md:block" aria-label="Perfil activo"></div>
+        <button id="btn-refresh" type="button"
+                class="px-3 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                aria-label="Refrescar los datos del dashboard">
+          <span aria-hidden="true">↻</span> Refrescar
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+  <main id="main-content" class="max-w-7xl mx-auto px-6 py-8 space-y-8" role="main">
 
     <!-- Intro line -->
     <div class="flex items-baseline justify-between">
       <div>
         <h2 class="font-display text-3xl">Estado del sistema</h2>
-        <p class="text-muted text-sm">Datos consolidados desde <code id="data-source" class="text-xs bg-slate-100 px-1.5 rounded"></code></p>
+        <p class="text-muted text-sm">Datos consolidados desde <code id="data-source" class="text-xs bg-slate-100 px-1.5 rounded" aria-label="Directorio Cognito origen de los datos"></code></p>
       </div>
-      <p id="generated-at" class="text-xs text-muted"></p>
+      <p id="generated-at" class="text-xs text-muted" aria-live="polite"></p>
     </div>
 
     <!-- KPI cards -->
-    <section id="kpis" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <section id="kpis" class="grid grid-cols-2 md:grid-cols-4 gap-4"
+             aria-label="Indicadores clave de rendimiento"
+             aria-live="polite">
       <!-- Populated by JS -->
     </section>
 
     <!-- Charts row -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6" aria-label="Gráficas por modo y por fase">
       <div class="bg-white rounded-xl border border-slate-200 p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold">Uso por modo</h3>
+          <h3 class="font-semibold" id="modes-chart-title">Uso por modo</h3>
           <span class="text-xs text-muted">Total inyecciones</span>
         </div>
-        <canvas id="chart-modes" height="180"></canvas>
+        <canvas id="chart-modes" height="180"
+                role="img"
+                aria-labelledby="modes-chart-title"
+                aria-describedby="modes-chart-desc"></canvas>
+        <p id="modes-chart-desc" class="sr-only">Gráfica de barras con el número total de inyecciones por cada uno de los siete modos de Cognito.</p>
       </div>
 
       <div class="bg-white rounded-xl border border-slate-200 p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold">Sesiones por fase</h3>
+          <h3 class="font-semibold" id="phases-chart-title">Sesiones por fase</h3>
           <span class="text-xs text-muted">Al cerrar sesión</span>
         </div>
-        <canvas id="chart-phases" height="180"></canvas>
+        <canvas id="chart-phases" height="180"
+                role="img"
+                aria-labelledby="phases-chart-title"
+                aria-describedby="phases-chart-desc"></canvas>
+        <p id="phases-chart-desc" class="sr-only">Gráfica tipo dona con la distribución de sesiones cerradas por fase (Discovery, Planning, Execution, Review, Shipping).</p>
       </div>
     </section>
 
     <!-- Activity + Gates -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6" aria-label="Actividad reciente y gates disparados">
       <div class="bg-white rounded-xl border border-slate-200 p-5 lg:col-span-2">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold">Actividad reciente</h3>
+          <h3 class="font-semibold" id="timeline-chart-title">Actividad reciente</h3>
           <span class="text-xs text-muted">Últimos 30 días</span>
         </div>
-        <canvas id="chart-timeline" height="120"></canvas>
+        <canvas id="chart-timeline" height="120"
+                role="img"
+                aria-labelledby="timeline-chart-title"
+                aria-describedby="timeline-chart-desc"></canvas>
+        <p id="timeline-chart-desc" class="sr-only">Gráfica de líneas con la evolución diaria de sesiones, gates disparados e inyecciones durante los últimos 30 días.</p>
       </div>
 
       <div class="bg-white rounded-xl border border-slate-200 p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold">Gates disparados</h3>
+          <h3 class="font-semibold" id="gates-list-title">Gates disparados</h3>
           <span class="text-xs text-muted">Top 10</span>
         </div>
-        <div id="gates-list" class="space-y-2"></div>
+        <div id="gates-list" class="space-y-2" role="list" aria-labelledby="gates-list-title" aria-live="polite"></div>
       </div>
     </section>
 
     <!-- Sinapsis bridge -->
-    <section id="sinapsis-section" class="bg-white rounded-xl border border-slate-200 p-5">
+    <section id="sinapsis-section" class="bg-white rounded-xl border border-slate-200 p-5" aria-labelledby="sinapsis-section-title">
       <div class="flex items-center justify-between mb-3">
         <div>
-          <h3 class="font-semibold">Integración Sinapsis</h3>
+          <h3 class="font-semibold" id="sinapsis-section-title">Integración Sinapsis</h3>
           <p class="text-xs text-muted">Bridge opcional con aprendizaje continuo</p>
         </div>
-        <div id="sinapsis-badge"></div>
+        <div id="sinapsis-badge" aria-live="polite"></div>
       </div>
-      <div id="sinapsis-details" class="text-sm text-muted"></div>
+      <div id="sinapsis-details" class="text-sm text-muted" aria-live="polite"></div>
     </section>
 
     <!-- Recent sessions -->
-    <section class="bg-white rounded-xl border border-slate-200 p-5">
+    <section class="bg-white rounded-xl border border-slate-200 p-5" aria-labelledby="recent-sessions-title">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-semibold">Sesiones recientes</h3>
+        <h3 class="font-semibold" id="recent-sessions-title">Sesiones recientes</h3>
         <span class="text-xs text-muted">Últimas 20</span>
       </div>
       <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
+        <table class="min-w-full text-sm" aria-labelledby="recent-sessions-title">
+          <caption class="sr-only">Listado de las últimas 20 sesiones cerradas con su fase, gates, inyecciones y detecciones.</caption>
           <thead>
             <tr class="border-b border-slate-200 text-left text-muted text-xs uppercase">
-              <th class="pb-2 font-medium">Session ID</th>
-              <th class="pb-2 font-medium">Cerrada</th>
-              <th class="pb-2 font-medium">Fase</th>
-              <th class="pb-2 font-medium text-right">Gates</th>
-              <th class="pb-2 font-medium text-right">Inyecciones</th>
-              <th class="pb-2 font-medium text-right">Detecciones</th>
+              <th scope="col" class="pb-2 font-medium">Session ID</th>
+              <th scope="col" class="pb-2 font-medium">Cerrada</th>
+              <th scope="col" class="pb-2 font-medium">Fase</th>
+              <th scope="col" class="pb-2 font-medium text-right">Gates</th>
+              <th scope="col" class="pb-2 font-medium text-right">Inyecciones</th>
+              <th scope="col" class="pb-2 font-medium text-right">Detecciones</th>
             </tr>
           </thead>
           <tbody id="sessions-table"></tbody>
@@ -159,8 +179,8 @@
       </div>
     </section>
 
-    <footer class="pt-8 pb-4 text-center text-xs text-muted">
-      Cognito v1.0.0 · <a href="https://github.com/Luispitik/cognito" class="underline">GitHub</a> · MIT License
+    <footer class="pt-8 pb-4 text-center text-xs text-muted" role="contentinfo">
+      <span id="dashboard-version">Cognito</span> · <a href="https://github.com/Luispitik/cognito" class="underline">GitHub</a> · MIT License
     </footer>
   </main>
 

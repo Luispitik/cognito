@@ -362,3 +362,59 @@ The default regex catches `const email = "foo@bar.com"` but misses JSON (`"email
 ### `hookIntensity` is dead configuration
 
 `_phases.json` declares per-phase `hookIntensity` (`low/medium/high`). No hook reads it. Kept for API stability; will be removed or wired up in v2.0.
+
+---
+
+## 14. Compatibility with Claude Opus 4.7 (v2.1)
+
+Cognito does NOT call the Claude API directly. `grep -rn "anthropic\|api.anthropic" hooks/ integrations/` returns 0 matches. All interaction with the model goes through Claude Code's hook surface — Cognito emits `{"systemMessage": "..."}` JSON on stdout; the harness renders that into the Messages API request.
+
+This means every model migration (Opus 4.5 → 4.6 → 4.7) is **transparent** for Cognito. v2.1 still earns its keep: it aligns Cognito's output with the knobs Opus 4.7 exposes.
+
+### What changes in Opus 4.7 that matters for Cognito
+
+| Opus 4.7 change | Risk for Cognito | v2.1 response |
+|---|---|---|
+| `thinking: {type: "enabled", budget_tokens: N}` → **400 error** | Low — Cognito never emitted this | Added `TestNoDeprecated47Params` anti-regression test scanning all `modes/*/SKILL.md` for `budget_tokens`, `top_p`, `top_k` as literal `key=` or `key:` instructions. |
+| `temperature`, `top_p`, `top_k` → **400 error** | Low — same reason | Same test covers this. |
+| Prefill (last-assistant-turn) → **400 error** | None — systemMessage is not prefill | No-op. |
+| `effort` parameter "matters more than on any prior Opus" | **Opportunity** — Cognito had determinism levels per mode that never surfaced as effort | Added `recommendedEffort: low/medium/high/max` per mode + `_DETERMINISM_TO_EFFORT` fallback. `mode_injector.py` emits an effort block at the end of the systemMessage. |
+| 1M context window | **Opportunity** — prior 16k injection cap wasted headroom | `MAX_TOTAL_CHARS` raised from 16 000 → 48 000, `MAX_PER_MODE` from 6 000 → 8 000. Full Divergente SKILL.md (6.5k chars) now lands untruncated. |
+| Cache minimum 4096 tokens | **Opportunity** — prior budget (~4k tokens) sat at the threshold | With the new 48k budget (~12k tokens), a single injection bundle crosses the cache floor reliably. `scripts/benchmark-cache.sh` measures real hit ratio against the API (opt-in via `COGNITO_BENCHMARK_LIVE=1`). |
+
+### Effort precedence (one source of truth)
+
+The hint appended by `mode_injector` is computed with this precedence:
+
+```
+1. _phase-state.json → overrideEffort (operator forced via /cognition-effort)
+2. _modes.json → modes.<id>.recommendedEffort (per-mode frontmatter)
+3. _DETERMINISM_TO_EFFORT fallback:
+      low    → medium
+      medium → high
+      high   → high
+```
+
+When multiple modes are active, the highest-effort level wins (any `max` promotes the session-level suggestion). The hint is **advisory only**: the harness (or the operator's own application calling the API) decides whether to pass it to `output_config.effort`.
+
+### `/cognition-effort` slash command
+
+New in v2.1. Lets the operator pin a level for the session without editing JSON:
+
+```
+/cognition-effort max     # pin max (Opus-only)
+/cognition-effort medium  # pin medium
+/cognition-effort off     # remove override, back to recommended
+```
+
+### What does NOT change with 4.7
+
+- **Hook latency.** Measured delta is 0 — cold start is bash + Python, independent of model.
+- **Gate behavior.** `gate-validator.sh` regex matching is local. `no-hardcode-pii` remains narrow (gitleaks subprocess is tracked for future).
+- **Sinapsis bridge.** Schema-tolerant reader is model-agnostic.
+
+### What v2.1 explicitly does NOT do
+
+- **Does NOT wrap the Anthropic SDK.** Cognito still has zero direct API calls. If you want Cognito to *drive* a Managed Agent session, that's v3.0 — tracked in ROADMAP.md.
+- **Does NOT mandate the effort hint.** The block is opt-in from the consumer side. Harnesses that ignore it keep working unchanged.
+- **Does NOT switch models.** The active model is a harness choice (`claude-opus-4-7` is the SDK default). Cognito's SKILL.md, hooks, and gates are model-neutral.

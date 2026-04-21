@@ -8,6 +8,7 @@ Valida:
 - Lee instincts y los ordena por occurrences.
 - Render no crashea con datos vacíos.
 - Tolera formatos variantes del schema de Sinapsis.
+- Auto-detect cubre `norteia-continuous-learning` (Sinapsis v4.3+ empaquetado como skill).
 """
 import json
 import sys
@@ -19,7 +20,7 @@ import pytest
 PROJECT_ROOT = Path(__file__).parent.parent.parent.resolve()
 sys.path.insert(0, str(PROJECT_ROOT / "integrations"))
 
-from sinapsis_bridge import SinapsisBridge  # noqa: E402
+from sinapsis_bridge import SinapsisBridge, _CANDIDATE_ROOTS  # noqa: E402
 
 
 # --------------------------------------------------------------------
@@ -252,3 +253,42 @@ class TestStatusDict:
         assert status["available"] is True
         assert status["version"] == "4.9.0-test"
         assert status["instincts_count"] == 3
+
+
+# --------------------------------------------------------------------
+# Tests de auto-detect: rutas canónicas donde puede vivir Sinapsis
+# --------------------------------------------------------------------
+class TestAutoDetectCandidates:
+    """Verifica que `_CANDIDATE_ROOTS` cubre las instalaciones reales observadas."""
+
+    def test_candidates_include_norteia_continuous_learning(self):
+        assert "~/.claude/skills/norteia-continuous-learning" in _CANDIDATE_ROOTS
+
+    def test_candidates_include_generic_sinapsis(self):
+        assert "~/.claude/skills/sinapsis" in _CANDIDATE_ROOTS
+
+    def test_detect_finds_sinapsis_in_skills_dir(self, tmp_path, monkeypatch):
+        """Cuando HOME apunta a un árbol con `~/.claude/skills/norteia-continuous-learning`
+        bien formado, `detect()` sin `explicit_path` debe encontrarlo automáticamente."""
+        fake_home = tmp_path / "home"
+        ncl = fake_home / ".claude" / "skills" / "norteia-continuous-learning"
+        ncl.mkdir(parents=True)
+        (ncl / "SKILL.md").write_text(
+            "---\nname: norteia-continuous-learning\nversion: 4.3.0\n---\n",
+            encoding="utf-8",
+        )
+        (ncl / "_instincts-index.json").write_text(
+            json.dumps({"instincts": [
+                {"id": "x", "rule": "r", "confidence": "confirmed", "occurrences": 1}
+            ]}),
+            encoding="utf-8",
+        )
+
+        monkeypatch.setenv("HOME", str(fake_home))
+        monkeypatch.setenv("USERPROFILE", str(fake_home))  # Windows equivalent
+        monkeypatch.delenv("SINAPSIS_DIR", raising=False)
+
+        bridge = SinapsisBridge.detect()
+        assert bridge.available is True, bridge.reason_unavailable
+        assert bridge.version == "4.3.0"
+        assert len(bridge.get_active_instincts()) == 1

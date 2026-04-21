@@ -1,10 +1,11 @@
 {
-  "version": "1.0.0",
-  "description": "Default de phase-state. Se copia a _phase-state.json en instalación.",
+  "version": "1.1.0",
+  "description": "Default de phase-state. Se copia a _phase-state.json en instalación. v1.1: overrideEffort permite forzar un nivel (low/medium/high/max) por sesión; null deja que mode_injector use el recommendedEffort del modo activo (Cognito v2.1).",
   "current": "discovery",
   "since": "2026-04-15T00:00:00Z",
   "previousPhases": [],
   "overrideModes": [],
+  "overrideEffort": null,
   "sessionId": null,
   "lastUpdatedBy": "install-default"
 }

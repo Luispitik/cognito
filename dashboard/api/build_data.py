@@ -215,6 +215,25 @@ def _activity_timeline(cognito_dir: Path, sessions: list[dict], days: int = 30) 
     ]
 
 
+_SEMVER_RE = re.compile(r"^\s*##\s*\[(\d+\.\d+\.\d+)\]")
+
+
+def _read_version(cognito_dir: Path) -> str | None:
+    """Extract the latest semver from CHANGELOG.md. None if absent/malformed."""
+    changelog = cognito_dir / "CHANGELOG.md"
+    if not changelog.exists():
+        return None
+    try:
+        with open(changelog, encoding="utf-8") as f:
+            for line in f:
+                m = _SEMVER_RE.match(line)
+                if m:
+                    return m.group(1)
+    except OSError:
+        return None
+    return None
+
+
 def build(cognito_dir: Path) -> dict:
     status = _read_status(cognito_dir)
     sessions = _read_sessions(cognito_dir)
@@ -233,6 +252,7 @@ def build(cognito_dir: Path) -> dict:
     return {
         "generatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "cognitoDir": str(cognito_dir),
+        "version": _read_version(cognito_dir),
         "status": status,
         "totals": totals,
         "modeUsage": mode_usage,

@@ -1,0 +1,9 @@
+{
+  "hook_event_name": "PreToolUse",
+  "session_id": "audit-iso25010-sess-0001",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/tmp/audit-cognito/example.py",
+    "content": "import os\nimport requests\nfrom prisma import Prisma\n\ndef send_email(recipient):\n    payload = {'to': recipient, 'subject': 'hello'}\n    return requests.post('https://api.example.com/send', json=payload)\n"
+  }
+}

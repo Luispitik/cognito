@@ -126,7 +126,7 @@ When you install Cognito, consider:
 1. **Review the hooks** in `hooks/` before registering them in `settings.json`. They run with your user privileges on every Claude Code action.
 2. **Do not commit** `logs/`, `sessions/`, `dashboard/data.json`, or `config/_phase-state.json` — they may contain prompt content or file paths. The default `.gitignore` excludes them.
 3. **Keep `bash`, `jq`, `python3` updated** — hooks depend on these system tools.
-4. **Pin your Cognito version** in any downstream automation: `git clone --branch v1.0.0` or use a submodule tracking a tag.
+4. **Pin your Cognito version** in any downstream automation: `git clone --branch v1.1.0` or use a submodule tracking a tag.
 5. **Disable gates you don't need** — an always-on gate that matches broadly may log sensitive content. See `config/_operator-config.json → gates.enabled`.
 6. **Run the test suite** before trusting a fork: `bash tests/run_tests.sh` must report all passing.
 

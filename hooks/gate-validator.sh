@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Cognito — gate-validator.sh
+# Cognito - gate-validator.sh (v1.2 wrapper)
 # =============================================================================
-# Hook: PreToolUse (matcher: Write, Edit)
-# Función: Valida anti-patrones. Bloquea (exit 1) o avisa (exit 0 + mensaje).
-# Versión: 1.0.0
+# Hook: PreToolUse (matcher: Write, Edit).
+# Version: 1.2.0
+# Delegates to hooks/python/gate_validator.py.
 # =============================================================================
 
 set -uo pipefail
@@ -24,135 +24,23 @@ fi
 if command -v cygpath >/dev/null 2>&1; then
     COGNITO_DIR_RESOLVED=$(cygpath -m "$COGNITO_DIR_RESOLVED" 2>/dev/null || echo "$COGNITO_DIR_RESOLVED")
 fi
-
 export COGNITO_DIR_RESOLVED
 
-mkdir -p "$COGNITO_DIR_RESOLVED/logs" 2>/dev/null || true
-
-# Stdin size cap (1 MiB) — gate validator must not blow up on huge payloads.
 INPUT_JSON=$(head -c 1048576 2>/dev/null || echo "{}")
 export INPUT_JSON
 
-python3 <<'PYEOF'
-import fnmatch
-import json
-import os
-import re
-import sys
-from datetime import datetime, timezone
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-cognito_dir = os.environ.get("COGNITO_DIR_RESOLVED", "")
-triggers_file = os.path.join(cognito_dir, "config", "_passive-triggers.json")
-operator_file = os.path.join(cognito_dir, "config", "_operator-config.json")
-log_file = os.path.join(cognito_dir, "logs", "gate-validator.log")
+if [ -f "$SCRIPT_DIR/python/_daemon.py" ]; then
+    python3 "$SCRIPT_DIR/python/_daemon.py" client gate-validator
+    _rc=$?
+    if [ "$_rc" != "127" ]; then
+        exit "$_rc"
+    fi
+fi
 
-# Parse input
-input_json = os.environ.get("INPUT_JSON", "{}")
-try:
-    data = json.loads(input_json)
-    if not isinstance(data, dict):
-        data = {}
-except (json.JSONDecodeError, TypeError):
-    data = {}
-
-# session_id tagging: every log line carries the session for reliable
-# per-session metrics in session-closer (v1.1.0).
-_SESSION_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
-_raw_sid = data.get("session_id") or data.get("sessionId") or ""
-if isinstance(_raw_sid, str) and _SESSION_ID_RE.match(_raw_sid):
-    SESSION_ID = _raw_sid
-else:
-    SESSION_ID = "unknown"
-
-def log(msg):
-    try:
-        with open(log_file, "a", encoding="utf-8") as f:
-            ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-            f.write(f"[{ts}] [{SESSION_ID}] {msg}\n")
-    except Exception:
-        pass
-
-tool_input = data.get("tool_input", data.get("input", {}))
-if not isinstance(tool_input, dict):
-    tool_input = {}
-
-file_path = tool_input.get("file_path", "")
-content = tool_input.get("content", tool_input.get("new_string", ""))
-
-if not file_path:
-    log("Sin file_path. Salgo.")
-    sys.exit(0)
-
-# Config
-for f in (triggers_file, operator_file):
-    if not os.path.exists(f):
-        log(f"Config ausente: {f}. Salgo sin validar.")
-        sys.exit(0)
-
-try:
-    with open(triggers_file, encoding="utf-8") as f:
-        triggers = json.load(f)
-    with open(operator_file, encoding="utf-8") as f:
-        operator = json.load(f)
-except (json.JSONDecodeError, IOError) as e:
-    log(f"Config ilegible: {e}")
-    sys.exit(0)
-
-enabled_gates = set(operator.get("gates", {}).get("enabled", []))
-disabled_gates = set(operator.get("gates", {}).get("disabled", []))
-
-violations = []
-file_basename = os.path.basename(file_path)
-
-for rule in triggers.get("gates", {}).get("rules", []):
-    gate_id = rule.get("id", "")
-    if gate_id not in enabled_gates or gate_id in disabled_gates:
-        continue
-
-    files_affected = rule.get("filesAffected", ["*"])
-    matches_file = any(
-        fnmatch.fnmatch(file_path, pat) or fnmatch.fnmatch(file_basename, pat)
-        for pat in files_affected
-    )
-    if not matches_file:
-        continue
-
-    pattern = rule.get("pattern", "")
-    try:
-        if re.search(pattern, content, re.IGNORECASE):
-            violations.append({
-                "id": gate_id,
-                "action": rule.get("action", "warn"),
-                "message": rule.get("message", ""),
-                "override": rule.get("override"),
-            })
-    except re.error:
-        continue
-
-if not violations:
-    log(f"Sin violaciones para {file_path}")
-    sys.exit(0)
-
-ids = [v["id"] for v in violations]
-log(f"Violaciones para {file_path}: {ids}")
-
-has_block = any(v.get("action") == "block" for v in violations)
-
-parts = []
-for v in violations:
-    emoji = "[BLOCK]" if v["action"] == "block" else "[WARN]"
-    line = f"{emoji} Gate [{v['id']}]: {v['message']}"
-    if v.get("override"):
-        line += f" Override: {v['override']}"
-    parts.append(line)
-message = "\n".join(parts)
-
-if has_block:
-    print(message, file=sys.stderr)
-    sys.exit(1)
-else:
-    print(json.dumps({"systemMessage": message}))
-    sys.exit(0)
-PYEOF
-
-exit $?
+if [ -f "$SCRIPT_DIR/python/gate_validator.py" ]; then
+    exec python3 "$SCRIPT_DIR/python/gate_validator.py"
+else
+    exec python3 -m hooks.python.gate_validator
+fi

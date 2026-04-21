@@ -63,48 +63,73 @@ class TestPhaseDetectorWordBoundaries:
 
 
 class TestModeInjectorNoTruncation:
-    """Pre-1.1 truncated SKILL.md at 60 lines -> Triggers sections dropped."""
+    """Pre-1.1 truncated SKILL.md at 60 lines -> Triggers sections dropped.
+
+    v1.2 moved the heredoc to hooks/python/mode_injector.py. These tests now
+    look at the Python source directly (where the logic actually lives).
+    """
 
     def test_source_does_not_slice_60_lines(self):
-        src = (REPO / "hooks" / "mode-injector.sh").read_text(encoding="utf-8")
-        assert "readlines()[:60]" not in src, (
+        py_src = (REPO / "hooks" / "python" / "mode_injector.py").read_text(encoding="utf-8")
+        assert "readlines()[:60]" not in py_src, (
             "Pre-1.1 60-line truncation re-introduced. Use _smart_truncate()."
         )
-        assert "_smart_truncate" in src, "smart truncate helper missing"
+        assert "_smart_truncate" in py_src, "smart truncate helper missing"
 
     def test_budget_limits_defined(self):
-        src = (REPO / "hooks" / "mode-injector.sh").read_text(encoding="utf-8")
-        # MAX_PER_MODE and MAX_TOTAL_CHARS must be explicit
-        assert "MAX_PER_MODE" in src
-        assert "MAX_TOTAL_CHARS" in src
+        py_src = (REPO / "hooks" / "python" / "mode_injector.py").read_text(encoding="utf-8")
+        assert "MAX_PER_MODE" in py_src
+        assert "MAX_TOTAL_CHARS" in py_src
 
     def test_mode_injector_on_user_prompt_submit(self):
-        """Fire once per turn, not on every tool call."""
-        src = (REPO / "hooks" / "mode-injector.sh").read_text(encoding="utf-8")
-        assert "UserPromptSubmit" in src, (
-            "mode-injector header must declare UserPromptSubmit as its hook event."
+        """Fire once per turn, not on every tool call. The bash wrapper header
+        documents which harness event this hook is wired to."""
+        sh_src = (REPO / "hooks" / "mode-injector.sh").read_text(encoding="utf-8")
+        assert "UserPromptSubmit" in sh_src, (
+            "mode-injector wrapper header must declare UserPromptSubmit."
         )
 
 
 class TestSessionIdTagging:
-    """Every hook must tag log lines with [session_id] for per-session metrics."""
+    """Every hook must tag log lines with [session_id] for per-session metrics.
 
-    @pytest.mark.parametrize("hook", [
-        "phase-detector.sh",
-        "mode-injector.sh",
-        "gate-validator.sh",
-        "session-closer.sh",
+    v1.2: session_id tagging now lives in the shared helper
+    hooks/python/_common.py — `make_logger()` prepends `[{session_id}]` to every
+    line. Each hook module delegates to it.
+    """
+
+    def test_common_logger_tags_session(self):
+        """The single source of truth for log tagging is _common.make_logger."""
+        src = (REPO / "hooks" / "python" / "_common.py").read_text(encoding="utf-8")
+        assert "make_logger" in src, "_common must expose make_logger()"
+        # Actual tag composition: `sid_tag = f"[{session_id}]"` followed by
+        # writing `f.write(f"[{ts}] {sid_tag} {msg}\n")`. Both fragments must
+        # remain present so log parsing by session-closer keeps working.
+        assert 'sid_tag = f"[{session_id}]"' in src, "sid_tag format changed"
+        assert "{sid_tag}" in src, "log format does not interpolate sid_tag"
+
+    def test_extract_session_id_present(self):
+        src = (REPO / "hooks" / "python" / "_common.py").read_text(encoding="utf-8")
+        assert "def extract_session_id" in src
+        # The validating regex must be preserved — it's a security boundary
+        # (session_id is used as a filename in session-closer).
+        assert "_SESSION_ID_RE" in src
+        assert "[A-Za-z0-9_.-]{1,64}" in src
+
+    @pytest.mark.parametrize("hook_module", [
+        "phase_detector.py",
+        "mode_injector.py",
+        "gate_validator.py",
+        "session_closer.py",
     ])
-    def test_hook_tags_log_lines_with_session(self, hook):
-        src = (REPO / "hooks" / hook).read_text(encoding="utf-8")
-        # Must build a SESSION_ID from input and use it in log format
-        assert "SESSION_ID" in src, (
-            f"{hook} does not tag log lines with [session_id]."
+    def test_hook_uses_common_logger(self, hook_module):
+        """Each hook imports _common and builds its logger via make_logger()."""
+        src = (REPO / "hooks" / "python" / hook_module).read_text(encoding="utf-8")
+        assert "_common" in src, f"{hook_module} must import _common"
+        assert "make_logger" in src, f"{hook_module} must call make_logger()"
+        assert "extract_session_id" in src, (
+            f"{hook_module} must extract session_id via the shared helper"
         )
-        # Must write the tag in the log format (either `[{SESSION_ID}]` or
-        # `{SESSION_TAG}` used in session-closer).
-        tagged = "[{SESSION_ID}]" in src or "SESSION_TAG" in src
-        assert tagged, f"{hook} log() does not include session tag"
 
 
 class TestSessionCloserPerSessionMetrics:

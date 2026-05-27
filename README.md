@@ -5,7 +5,7 @@
 [![Lint](https://github.com/Luispitik/cognito/actions/workflows/lint.yml/badge.svg)](https://github.com/Luispitik/cognito/actions/workflows/lint.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits)](https://www.conventionalcommits.org)
-[![Version](https://img.shields.io/badge/version-2.2.0-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.1-blue)](CHANGELOG.md)
 
 **Cognito** es un sistema operativo de pensamiento que orquesta **7 modos cognitivos** según **5 fases de proyecto**, con **determinismo selectivo** en los puntos críticos y libertad creativa donde importa.
 
@@ -171,7 +171,7 @@ cognito/
 └── .github/workflows/            ← test + security + lint + release + stale
 ```
 
-**Test count (v2.2.0):** 301 pytest + 22 bats = 323 (18 pytest skipped on Windows for platform-specific reasons; tracked in ROADMAP).
+**Test count (v2.2.1):** 323 pytest + 22 bats = 345 (22 pytest skipped on Windows for platform-specific reasons; tracked in ROADMAP).
 
 ---
 

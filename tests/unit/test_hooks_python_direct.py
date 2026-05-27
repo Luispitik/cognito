@@ -198,7 +198,10 @@ class TestGateValidatorDirect:
             }),
             monkeypatch, capsys,
         )
-        assert rc == 1
+        # Exit 2 is Claude Code's blocking contract for PreToolUse (stderr is
+        # fed back to the model). Exit 1 would be a non-blocking error and the
+        # Write would proceed — see hooks/python/gate_validator.py.
+        assert rc == 2
         assert "BLOCK" in err or "Gate" in err
 
     def test_benign_file_passes(self, iso_cognito, monkeypatch, capsys):

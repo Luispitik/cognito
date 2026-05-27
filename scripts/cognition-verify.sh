@@ -252,7 +252,7 @@ for h in HOOKS:
     else:
         check(f"hooks/{h}", "warn", "not executable (chmod +x)")
 
-# 7. settings.json has the cognito-* hooks registered
+# 7. settings.json has the Cognito hooks registered
 if not SETTINGS.is_file():
     check("settings.json", "warn", f"not found: {SETTINGS}")
 else:
@@ -264,14 +264,23 @@ else:
         registered = set()
         for event, entries in hooks_block.items():
             for entry in entries or []:
+                if not isinstance(entry, dict):
+                    continue
+                # Legacy non-standard shape: top-level "cognito-*" name.
                 name = entry.get("name", "")
                 if name.startswith("cognito-"):
                     registered.add(name.replace("cognito-", "") + ".sh")
+                # Standard Claude Code schema: matcher-group with hooks[].command.
+                for cmd_obj in entry.get("hooks") or []:
+                    cmd = (cmd_obj or {}).get("command", "") if isinstance(cmd_obj, dict) else ""
+                    for base in HOOKS:
+                        if cmd.endswith("/hooks/" + base):
+                            registered.add(base)
         missing = [h for h in installed_hooks if h not in registered]
         if not installed_hooks:
             check("settings-hooks", "warn", "no hooks installed to register")
         elif not missing:
-            check("settings-hooks", "ok", f"{len(registered)} cognito-* hook(s) registered")
+            check("settings-hooks", "ok", f"{len(registered)} Cognito hook(s) registered")
         else:
             check("settings-hooks", "warn", f"unregistered: {', '.join(missing)}")
     except Exception as e:

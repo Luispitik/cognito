@@ -409,27 +409,37 @@ import json, os
 hooks_dir = os.environ["COGNITO_HOOKS_DIR"]
 enabled = os.environ["COGNITO_ENABLED_HOOKS"].split()
 
+# (event, matcher) per the Claude Code hooks schema. matcher=None omits the key
+# (correct for tool-less events like UserPromptSubmit / Stop). PreToolUse uses a
+# regex string matched against the tool name -- NOT a {"tool": [...]} object.
 HOOK_META = {
-    "phase-detector":  ("UserPromptSubmit", False, None),
-    "mode-injector":   ("UserPromptSubmit", False, None),
-    "gate-validator":  ("PreToolUse",       True,  {"tool": ["Write", "Edit"]}),
-    "session-closer":  ("Stop",             False, None),
+    "phase-detector": ("UserPromptSubmit", None),
+    "mode-injector":  ("UserPromptSubmit", None),
+    "gate-validator": ("PreToolUse", "Write|Edit"),
+    "session-closer": ("Stop", None),
 }
 
-out = {}
+# Group hooks sharing an (event, matcher) into one matcher-group so the output
+# is event -> [ { matcher?, hooks: [ {type:"command", command} ] } ], which is
+# the only shape Claude Code actually reads. There is no top-level name/blocking.
+groups = {}
+order = []
 for name in enabled:
     meta = HOOK_META.get(name)
     if not meta:
         continue
-    event, blocking, matchers = meta
-    entry = {
-        "name": f"cognito-{name}",
-        "command": f"bash {hooks_dir}/{name}.sh",
-        "blocking": blocking,
-    }
-    if matchers:
-        entry["matchers"] = matchers
-    out.setdefault(event, []).append(entry)
+    if meta not in groups:
+        groups[meta] = []
+        order.append(meta)
+    groups[meta].append({"type": "command", "command": f"bash {hooks_dir}/{name}.sh"})
+
+out = {}
+for event, matcher in order:
+    group = {}
+    if matcher is not None:
+        group["matcher"] = matcher
+    group["hooks"] = groups[(event, matcher)]
+    out.setdefault(event, []).append(group)
 print(json.dumps({"hooks": out}, indent=2))
 PYEOF
 unset COGNITO_HOOKS_DIR COGNITO_ENABLED_HOOKS
@@ -442,17 +452,29 @@ elif [ "$HAVE_JQ" = "1" ]; then
     if [ ! -f "$SETTINGS_FILE" ]; then echo "{}" > "$SETTINGS_FILE"; fi
     # Backup settings.json before rewrite
     cp "$SETTINGS_FILE" "${SETTINGS_FILE}.cognito.bak" 2>/dev/null || true
-    # Remove any prior cognito-* entries, then append the fresh ones.
+    # Strip prior Cognito registrations (both the legacy non-standard shape with
+    # a top-level "cognito-*" name AND the current standard shape whose command
+    # points at one of our hook scripts), then append the fresh groups. Only
+    # .hooks is ever reassigned, so statusLine/model/permissions/etc. and any
+    # third-party hooks are preserved untouched.
     jq --slurpfile add "$SNIPPET_FILE" '
+      def iscog($c):
+        [ "/hooks/phase-detector.sh", "/hooks/mode-injector.sh",
+          "/hooks/gate-validator.sh", "/hooks/session-closer.sh" ]
+        | map(. as $s | $c | endswith($s)) | any;
       .hooks = (.hooks // {})
       | .hooks = (
           .hooks
           | with_entries(
               .value = (
                 (.value // [])
-                | map(select(
-                    (.name // "") | startswith("cognito-") | not
-                  ))
+                | map(select((.name // "") | startswith("cognito-") | not))
+                | map(
+                    if (.hooks | type) == "array"
+                    then .hooks = (.hooks | map(select((.command // "") | iscog | not)))
+                    else . end
+                  )
+                | map(select(((.hooks | type) != "array") or ((.hooks | length) > 0)))
               )
             )
         )

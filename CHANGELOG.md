@@ -4,6 +4,47 @@ Versionado semver. Formato inspirado en [keepachangelog.com](https://keepachange
 
 ---
 
+## [2.2.1] — 2026-05-27 — "Hooks that actually fire"
+
+Patch release. Fixes the `settings.json` hook registration — it used a shape
+Claude Code never reads, so Cognito's hooks never fired — and corrects the
+gate's blocking exit code. **No breaking changes:** existing installs are
+migrated in place on reinstall/update.
+
+### Fixed
+
+- **Hook registration now uses the official Claude Code schema**
+  (`scripts/install.sh`, `INSTALL.md`). Hooks were written as
+  `{name, command, blocking, matchers}` array entries, but Claude Code expects
+  `event -> [ { matcher?, hooks: [ { "type": "command", "command": … } ] } ]`
+  and silently ignores anything else — so phase-detector, mode-injector,
+  gate-validator and session-closer were never invoked. The installer now emits
+  the correct shape; the jq merge strips both legacy (`cognito-*` name) and
+  current (command-path) registrations before re-adding, so reinstalling is
+  idempotent. Note on the "installing Cognito drops my statusLine / custom
+  hooks" report: that does **not** happen — the merge only ever reassigns
+  `.hooks`, third-party hooks are preserved, and a `.cognito.bak` backup is
+  written first — but the report correctly surfaced that the hooks weren't
+  working.
+- **`gate-validator` blocks with exit 2, not exit 1**
+  (`hooks/python/gate_validator.py`). Claude Code only blocks a `PreToolUse` on
+  exit 2; exit 1 is a non-blocking error, so `block`-action gates warned but let
+  the Write/Edit through. The daemon path already forwards the code verbatim.
+- **`uninstall.sh` and `cognition-verify.sh`** recognise the new command-based
+  registrations (plus legacy named entries) so cleanup and
+  `/cognition-status --verify` stay accurate.
+
+### Added
+
+- **`tests/unit/test_profile_install.py::TestSettingsMerge`** — 4 tests that
+  exercise the real jq merge into `settings.json` (the rest of the suite uses
+  `--skip-settings`, so this path had zero coverage): statusLine + third-party
+  hooks survive, the official schema is used, reinstall is idempotent, and
+  legacy named entries are replaced on upgrade. They run on Linux/macOS CI
+  (where jq is installed) and skip on Windows, like the other bash e2e tests.
+
+---
+
 ## [2.2.0] — 2026-04-21 — "Memory bridge + a11y polish"
 
 Minor release. Ships the opt-in Sinapsis → Claude `memory_20250818` bridge that

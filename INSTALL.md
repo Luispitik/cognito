@@ -96,7 +96,7 @@ bash scripts/uninstall.sh
 bash scripts/uninstall.sh --yes --target=~/.claude/cognito
 ```
 
-`uninstall.sh` removes the install directory, the 12 Cognito slash commands, the 7 mode skills, and — when jq is available — strips every `cognito-*` entry from `~/.claude/settings.json`.
+`uninstall.sh` removes the install directory, the 12 Cognito slash commands, the 7 mode skills, and — when jq is available — strips every Cognito hook entry from `~/.claude/settings.json` (both the current command-based registrations and any legacy `cognito-*` named entries).
 
 ## Manual installation (no script)
 
@@ -130,35 +130,33 @@ Merge this block into the `hooks` key of your `settings.json` (adjust the path i
   "hooks": {
     "UserPromptSubmit": [
       {
-        "name": "cognito-phase-detector",
-        "command": "bash ~/.claude/cognito/hooks/phase-detector.sh",
-        "blocking": false
-      },
-      {
-        "name": "cognito-mode-injector",
-        "command": "bash ~/.claude/cognito/hooks/mode-injector.sh",
-        "blocking": false
+        "hooks": [
+          { "type": "command", "command": "bash ~/.claude/cognito/hooks/phase-detector.sh" },
+          { "type": "command", "command": "bash ~/.claude/cognito/hooks/mode-injector.sh" }
+        ]
       }
     ],
     "PreToolUse": [
       {
-        "name": "cognito-gate-validator",
-        "command": "bash ~/.claude/cognito/hooks/gate-validator.sh",
-        "matchers": {"tool": ["Write", "Edit"]},
-        "blocking": true
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "bash ~/.claude/cognito/hooks/gate-validator.sh" }
+        ]
       }
     ],
     "Stop": [
       {
-        "name": "cognito-session-closer",
-        "command": "bash ~/.claude/cognito/hooks/session-closer.sh",
-        "blocking": false
+        "hooks": [
+          { "type": "command", "command": "bash ~/.claude/cognito/hooks/session-closer.sh" }
+        ]
       }
     ]
   }
 }
 ```
 
+> Schema: each event maps to an array of matcher-groups, and each group holds a `hooks` array of `{ "type": "command", "command": ... }`. The `matcher` is a regex matched against the tool name (omit it for tool-less events like `UserPromptSubmit` / `Stop`). There is no top-level `name`, `blocking`, or `matchers` field — Claude Code ignores those, so a hook registered that way never fires.
+>
 > Note: `mode-injector` lives on `UserPromptSubmit` since v1.1.0. Earlier versions registered it on `PreToolUse`, which caused redundant injection on every tool call.
 
 ## Troubleshooting

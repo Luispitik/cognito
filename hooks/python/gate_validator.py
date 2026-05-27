@@ -1,9 +1,10 @@
 """gate-validator hook — Python entry point (v1.2).
 
 Ported from `hooks/gate-validator.sh` heredoc. Runs on PreToolUse matching
-Write and Edit. Blocks (exit 1) or warns (exit 0 + systemMessage) depending
-on the rule action. Enabled/disabled gates come from operator-config;
-rule definitions from passive-triggers.
+Write and Edit. Blocks (exit 2 — the code Claude Code treats as a blocking
+error, feeding stderr back to the model) or warns (exit 0 + systemMessage)
+depending on the rule action. Enabled/disabled gates come from
+operator-config; rule definitions from passive-triggers.
 """
 from __future__ import annotations
 
@@ -104,8 +105,11 @@ def main() -> int:
     message = "\n".join(parts)
 
     if has_block:
+        # Exit 2 is the contract Claude Code uses for a *blocking* PreToolUse
+        # hook: it cancels the Write/Edit and feeds stderr back to the model.
+        # Any other non-zero code is a non-blocking error and the tool proceeds.
         print(message, file=sys.stderr)
-        return 1
+        return 2
     print(json.dumps({"systemMessage": message}))
     return 0
 

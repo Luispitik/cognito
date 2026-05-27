@@ -83,11 +83,16 @@ elif [ ! -f "$SETTINGS_FILE" ]; then
 elif ! command -v jq >/dev/null 2>&1; then
     cat <<EOF
 warn jq not installed — manual cleanup required.
-     Edit $SETTINGS_FILE and remove any hook entry whose "name" starts with "cognito-".
+     Edit $SETTINGS_FILE and remove any hook whose command points at
+     ~/.claude/cognito/hooks/*.sh (and any legacy entry whose "name" starts with "cognito-").
 EOF
 else
     cp "$SETTINGS_FILE" "${SETTINGS_FILE}.cognito.bak" 2>/dev/null || true
     jq '
+      def iscog($c):
+        [ "/hooks/phase-detector.sh", "/hooks/mode-injector.sh",
+          "/hooks/gate-validator.sh", "/hooks/session-closer.sh" ]
+        | map(. as $s | $c | endswith($s)) | any;
       if .hooks == null then .
       else
         .hooks = (
@@ -95,9 +100,13 @@ else
           | with_entries(
               .value = (
                 (.value // [])
-                | map(select(
-                    (.name // "") | startswith("cognito-") | not
-                  ))
+                | map(select((.name // "") | startswith("cognito-") | not))
+                | map(
+                    if (.hooks | type) == "array"
+                    then .hooks = (.hooks | map(select((.command // "") | iscog | not)))
+                    else . end
+                  )
+                | map(select(((.hooks | type) != "array") or ((.hooks | length) > 0)))
               )
             )
           | with_entries(select(.value != []))

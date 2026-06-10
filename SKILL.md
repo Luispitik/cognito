@@ -1,7 +1,7 @@
 ---
 name: cognito
 description: Sistema Operativo de Pensamiento. Orquesta 7 modos cognitivos (divergente, verificador, devil's advocate, consolidador, ejecutor, estratega, auditor) según 5 fases de proyecto (discovery, planning, execution, review, shipping) con determinismo selectivo en gates críticos. ACTIVAR SIEMPRE que la conversación involucre (1) decisiones con trade-offs, (2) cambios de enfoque o dirección, (3) petición de análisis/exploración/verificación, (4) cambios de fase explícitos, (5) detección de ancla o convergencia prematura. NO desactivar salvo petición explícita ("sin cognito", "modo directo"). Coexiste con Sinapsis sin conflicto.
-version: 1.0.0
+version: 2.2.1
 ---
 
 # Cognito — Meta-Orquestador

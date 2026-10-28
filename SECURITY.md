@@ -89,7 +89,7 @@ Cognito is a **local-only** tool that runs inside a user's Claude Code session. 
 |--------|------------|
 | **Malicious hook execution** — a compromised hook could run arbitrary code as the user | Hooks ship read-only in the repo, require explicit registration in `settings.json`, ShellCheck runs in CI |
 | **Path traversal** — crafted prompt or filename tricks a hook into reading/writing outside `COGNITO_DIR` | Paths resolved against a fixed base via `realpath`; gate-validator refuses paths containing `..` |
-| **Gate bypass** — content that should trigger a block does not | Regex tests + audit in `AUDIT-PRE-DEPLOY.md` |
+| **Gate bypass** — content that should trigger a block does not | Regex tests in `tests/unit/test_gate_validator.py` |
 | **Config injection** — malicious `_passive-triggers.json` adds rules that exfiltrate data | Config files live locally, never downloaded; user owns the install |
 | **Sinapsis bridge poisoning** — a malicious Sinapsis install injects harmful instincts | Auto-detect can be disabled in `_operator-config.json → integrations.sinapsis.installed: false` |
 | **Sensitive data in logs / sessions / dashboard** | `logs/`, `sessions/`, `dashboard/data.json` are `.gitignore`-d by default |

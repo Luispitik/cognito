@@ -35,7 +35,7 @@ _SKIP_ON_WINDOWS = pytest.mark.skipif(
 def _to_bash_path(path: Path) -> str:
     """Convert a Windows absolute path to Git Bash / MSYS style.
 
-    C:\\Users\\luis\\X  ->  /c/Users/luis/X
+    C:\\Users\\usuario\\X  ->  /c/Users/usuario/X
     Linux/macOS paths are returned unchanged.
     """
     s = path.as_posix()

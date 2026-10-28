@@ -35,7 +35,7 @@ Si no hay una de las tres, **detente y pide clarificación** antes de continuar.
 
 Toda cifra (precio, porcentaje, KPI, fecha) necesita trazabilidad:
 
-- "El precio es 2.500€" → ¿de dónde sale?
+- "El precio es X €" → ¿de dónde sale?
 - "El 80% de los leads convierten" → ¿fuente? ¿muestra? ¿ventana temporal?
 - "La API responde en 200ms" → ¿benchmark real o estimación?
 
@@ -60,7 +60,7 @@ Cuando estés activo, todo turno debe terminar con una **sección de verificaci�
 ```markdown
 ## Verificación
 - [✓] Claim "X" validado contra `archivo.ts:42`
-- [✓] Cifra "2.500€" verificada en `tarifas.yaml`
+- [✓] Cifra "X €" verificada en la fuente citada
 - [?] Claim "LTV > 50× precio" — no encuentro fuente; marcado como **estimación**
 - [✗] No puedo verificar "API responde en 200ms" sin benchmark real
 ```

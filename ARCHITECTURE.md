@@ -298,7 +298,7 @@ Rechazado porque: imposible de customizar por audiencia. Modularidad en `modes/`
 ### v2.0
 
 - Modos custom por usuario (`modes/custom/` + registro en `_modes.json`).
-- Marketplace público en GitHub (como Skills Marketplace en roadmap de Luis).
+- Marketplace público en GitHub (como Skills Marketplace en roadmap del autor).
 
 ---
 

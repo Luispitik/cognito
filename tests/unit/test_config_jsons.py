@@ -158,10 +158,9 @@ class TestOperatorConfigSchema:
             assert mode in valid_modes, f"Modo enabled inválido: {mode}"
 
     def test_default_profile_is_public(self, operator_config):
-        """Regresión para A1: el default debe ser 'public' (neutro) post-auditoría."""
+        """El perfil por defecto de un clon público es 'public'."""
         assert operator_config["profile"] == "public", (
-            "Default profile debe ser 'public' para que un clone sea neutro. "
-            "Ver AUDIT-PRE-DEPLOY.md → A1."
+            "Default profile debe ser 'public' para que un clone sea neutro."
         )
 
 

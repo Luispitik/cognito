@@ -51,7 +51,7 @@ strips:
   items:
     - "Referencias específicas al operador"
     - "Referencias específicas a personal brand"
-    - "Tarifas específicas (120-175€/h, 750-1.100€/jornada, LIDERA IA)"
+    - "Tarifas del operador"
     - "Marcas propietarias (Sinapsis, obsidian-sync)"
     - "Gates específicas de stack (Supabase RLS, n8n retired)"
 

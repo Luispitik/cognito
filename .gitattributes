@@ -46,4 +46,3 @@ logs/**                 linguist-generated=true
 .gitignore              export-ignore
 .editorconfig           export-ignore
 tests/                  export-ignore
-AUDIT-PRE-DEPLOY.md     export-ignore
